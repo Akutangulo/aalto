@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Temporizador de cuenta atrás</title>
+    <title>Aplicación para marcar los tiempos en los remontados - Temporizador de cuenta atrás</title>
     <style>
         body {
             display: flex;
@@ -15,14 +15,14 @@
             padding: 5px;
             margin: 3px;
             flex: 1;
-            max-width: calc(50% - 6px); /* Dos columnas con un margen de 3px entre ellas */
+            max-width: calc(40% - 6px); /* Dos columnas con un margen de 3px entre ellas */
         }
     </style>
 </head>
 <body>
     <div class="deposito">
         <label for="minutesInput1">Deposito 1:</label>
-        <input type="number" id="minutesInput1" class="minutes-input" min="1" step="1" value="40">
+        <input type="number" id="minutesInput1" class="minutes-input" min="1" step="1" value="30">
         <button class="start-button" data-target="timer1">Iniciar remontado</button>
         <div id="timer1" class="timer"></div>
     </div>
@@ -120,14 +120,14 @@
 
     <div class="deposito">
         <label for="minutesInput15">Deposito 15:</label>
-        <input type="number" id="minutesInput15" class="minutes-input" min="1" step="1" value="30">
+        <input type="number" id="minutesInput15" class="minutes-input" min="1" step="1" value="40">
         <button class="start-button" data-target="timer15">Iniciar remontado</button>
         <div id="timer15" class="timer"></div>
     </div>
 
     <div class="deposito">
         <label for="minutesInput16">Deposito 16:</label>
-        <input type="number" id="minutesInput16" class="minutes-input" min="1" step="1" value="30">
+        <input type="number" id="minutesInput16" class="minutes-input" min="1" step="1" value="40">
         <button class="start-button" data-target="timer16">Iniciar remontado</button>
         <div id="timer16" class="timer"></div>
     </div>
