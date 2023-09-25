@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temporizador de cuenta atrás</title>
+    <style>
+        body {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .deposito {
+            border-style: solid;
+            padding: 5px;
+            margin: 3px;
+            flex: 1;
+            max-width: calc(50% - 6px); /* Dos columnas con un margen de 3px entre ellas */
+        }
+    </style>
+</head>
+<body>
+    <div class="deposito">
+        <label for="minutesInput1">Deposito 1:</label>
+        <input type="number" id="minutesInput1" class="minutes-input" min="1" step="1" value="40">
+        <button class="start-button" data-target="timer1">Iniciar remontado</button>
+        <div id="timer1" class="timer"></div>
+    </div>
+
+    <div class="deposito">
+        <label for="minutesInput2">Deposito 2:</label>
+        <input type="number" id="minutesInput2" class="minutes-input" min="1" step="1" value="30">
+        <button class="start-button" data-target="timer2">Iniciar remontado</button>
+        <div id="timer2" class="timer"></div>
+    </div>
+
+    <div class="deposito">
+        <label for="minutesInput3">Deposito 3:</label>
+        <input type="number" id="minutesInput3" class="minutes-input" min="1" step="1" value="30">
+        <button class="start-button" data-target="timer3">Iniciar remontado</button>
+        <div id="timer3" class="timer"></div>
+    </div>
+
+    <div class="deposito">
+        <label for="minutesInput4">Deposito 4:</label>
+        <input type="number" id="minutesInput4" class="minutes-input" min="1" step="1" value="30">
+        <button class="start-button" data-target="timer4">Iniciar remontado</button>
+        <div id="timer4" class="timer"></div>
+    </div>
+
+    <div class="deposito">
+        <label for="minutesInput5">Deposito 5:</label>
+        <input type="number" id="minutesInput5" class="minutes-input" min="1" step="1" value="30">
+        <button class="start-button" data-target="timer5">Iniciar remontado</button>
+        <div id="timer5" class="timer"></div>
+    </div>
+
+    <div class="deposito">
+        <label for="minutesInput6">Deposito 6:</label>
+        <input type="number" id="minutesInput6" class="minutes-input" min="1" step="1" value="30">
+        <button class="start-button" data-target="timer6">Iniciar remontado</button>
+        <div id="timer6" class="timer"></div>
+    </div>
+
+    <script>
+        const startButtons = document.querySelectorAll(".start-button");
+        const minutesInputs = document.querySelectorAll(".minutes-input");
+
+        startButtons.forEach((button, index) => {
+            button.addEventListener("click", function () {
+                // Deshabilitar el botón para evitar que se inicie una cuenta atrás múltiples veces
+                this.disabled = true;
+
+                // Obtener el tiempo en minutos ingresado por el usuario
+                const minutosElegidos = parseInt(minutesInputs[index].value);
+                let segundosRestantes = minutosElegidos * 60;
+
+                const timerDisplay = document.getElementById(button.getAttribute("data-target"));
+
+                const audio = new Audio('alarma.mp3'); // Cambia 'alarma.mp3' por el nombre de tu archivo de sonido
+
+                const intervalId = setInterval(function () {
+                    const minutos = Math.floor(segundosRestantes / 60);
+                    const segundos = segundosRestantes % 60;
+
+                    timerDisplay.innerHTML = `${minutos}:${segundos < 10 ? '0' : ''}${segundos}`;
+
+                    if (segundosRestantes === 0) {
+                        clearInterval(intervalId);
+                        timerDisplay.innerHTML = "¡Tiempo agotado!";
+                        // Reproduce la alarma
+                        audio.play();
+                    } else {
+                        segundosRestantes--;
+                    }
+                }, 1000);
+            });
+        });
+    </script>
+</body>
+</html>
