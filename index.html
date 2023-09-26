@@ -16,6 +16,16 @@
         .clear {
             clear: both; /* Añade un elemento con clear:both para evitar que los elementos floten hacia abajo */
         }
+
+          /* Estilo para contadores activos (fondo rojo) */
+        .active {
+            background-color: red;
+        }
+
+        /* Estilo para contadores terminados (fondo verde) */
+        .finished {
+            background-color: green;
+        }
     </style>
 </head>
 <body>
@@ -270,7 +280,7 @@
     </div>
 
 
-<script>
+ <script>
         const startButtons = document.querySelectorAll(".start-button");
         const minutesInputs = document.querySelectorAll(".minutes-input");
 
@@ -303,10 +313,14 @@
                         timerDisplay.innerHTML = "¡Tiempo agotado!";
                         // Reproduce la alarma
                         audio.play();
+                        // Cambia la clase a "finished" para aplicar el estilo verde
+                        timerDisplay.classList.add("finished");
                     } else {
                         segundosRestantes--;
                         // Actualizar la hora de finalización en cada ciclo
                         endTimeDisplay.innerHTML = `Finaliza a las ${horaFinalizacion.getHours()}:${horaFinalizacion.getMinutes()}`;
+                        // Cambia la clase a "active" para aplicar el estilo rojo
+                        timerDisplay.classList.add("active");
                     }
                 }, 1000);
             });
