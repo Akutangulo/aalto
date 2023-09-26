@@ -239,7 +239,7 @@
     </div>
 
 
-    <script>
+<script>
         const startButtons = document.querySelectorAll(".start-button");
         const minutesInputs = document.querySelectorAll(".minutes-input");
 
@@ -253,8 +253,13 @@
                 let segundosRestantes = minutosElegidos * 60;
 
                 const timerDisplay = document.getElementById(button.getAttribute("data-target"));
+                const endTimeDisplay = document.getElementById(`endTime${index + 1}`);
 
-                const audio = new Audio('alarma.mp3'); // Cambia 'alarma.mp3' por el nombre de tu archivo de sonido
+                const audio = new Audio('Isabella_Late_Lp.mp3'); // Cambia 'alarma.mp3' por el nombre de tu archivo de sonido
+
+                // Calcular la hora de finalización
+                const horaFinalizacion = new Date();
+                horaFinalizacion.setMinutes(horaFinalizacion.getMinutes() + minutosElegidos);
 
                 const intervalId = setInterval(function () {
                     const minutos = Math.floor(segundosRestantes / 60);
@@ -269,6 +274,8 @@
                         audio.play();
                     } else {
                         segundosRestantes--;
+                        // Actualizar la hora de finalización en cada ciclo
+                        endTimeDisplay.innerHTML = `Finaliza a las ${horaFinalizacion.getHours()}:${horaFinalizacion.getMinutes()}`;
                     }
                 }, 1000);
             });
