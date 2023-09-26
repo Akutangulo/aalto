@@ -5,17 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aplicación para marcar los tiempos en los remontados - Temporizador de cuenta atrás</title>
     <style>
-        body {
-            display: flex;
-            flex-wrap: wrap;
-        }
-
-        .deposito {
+       .deposito {
             border-style: solid;
             padding: 5px;
             margin: 3px;
-            flex: 1;
-            max-width: calc(40% - 6px); /* Dos columnas con un margen de 3px entre ellas */
+            float: left;
+            width: 40%; /* El 48% asegura que haya un espacio mínimo entre las dos columnas */
+        }
+
+        .clear {
+            clear: both; /* Añade un elemento con clear:both para evitar que los elementos floten hacia abajo */
         }
     </style>
 </head>
@@ -131,6 +130,8 @@
         <button class="start-button" data-target="timer16">Iniciar remontado</button>
         <div id="timer16" class="timer"></div>
     </div>
+
+ <div class="clear"></div> <!-- Elemento clear para evitar que los elementos floten hacia abajo -->
     
      <div class="deposito">
         <label for="minutesInput17">Deposito 17 - A1:</label>
