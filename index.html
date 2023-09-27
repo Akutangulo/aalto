@@ -280,9 +280,26 @@
     </div>
 
 
- <script>
+<script>
         const startButtons = document.querySelectorAll(".start-button");
         const minutesInputs = document.querySelectorAll(".minutes-input");
+
+        // Agregar un evento de confirmación antes de actualizar la página
+        window.onbeforeunload = function (e) {
+            if (contadoresActivos()) {
+                return "¿Estás seguro de que deseas reiniciar los contadores?";
+            }
+        };
+
+        function contadoresActivos() {
+            const timers = document.querySelectorAll(".timer");
+            for (const timer of timers) {
+                if (!timer.classList.contains("finished")) {
+                    return true;
+                }
+            }
+            return false;
+        }
 
         startButtons.forEach((button, index) => {
             button.addEventListener("click", function () {
