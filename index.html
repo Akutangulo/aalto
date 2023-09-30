@@ -94,7 +94,9 @@
     </style>
 </head>
 <body>
-    <div class="deposito">
+   <div class="container">
+        <div class="column">
+    <div class="deposito box">
         <label for="minutesInput1">Deposito 1 - V1:</label>
         <input type="number" id="minutesInput1" class="minutes-input" min="1" step="1" value="30">
         <button class="start-button" data-target="timer1">Iniciar remontado</button>
@@ -238,7 +240,9 @@
         <input type="checkbox" style="accent-color: red">Automatico
     </div>
 
- <div class="clear"></div> <!-- Elemento clear para evitar que los elementos floten hacia abajo -->
+</div><!-- Fin div column -->
+        <div class="clear"></div> <!-- Elemento clear para evitar que los elementos floten hacia abajo -->
+<div class="column">
     
      <div class="deposito">
         <label for="minutesInput17">Deposito 17 - A1:</label>
@@ -384,6 +388,8 @@
          <input type="checkbox" style="accent-color: red">Automatico
     </div>
 
+    </div><!-- Fin div column -->
+    </div><!-- Fin div container -->
 
 <script>
         const startButtons = document.querySelectorAll(".start-button");
