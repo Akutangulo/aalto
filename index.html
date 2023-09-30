@@ -5,12 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aplicación para marcar los tiempos en los remontados - Temporizador de cuenta atrás</title>
     <style>
-       .deposito {
+        .deposito {
             border-style: solid;
             padding: 5px;
             margin: 3px;
-            float: left;
-            width: 40%; /* El 40% asegura que haya un espacio mínimo entre las dos columnas */
+            width: 48%; /* El 48% asegura que haya un espacio mínimo entre las dos columnas */
         }
 
         .clear {
@@ -18,13 +17,79 @@
         }
 
           /* Estilo para contadores activos (fondo rojo) */
-        .active {
+          .active {
             background-color: red;
         }
 
         /* Estilo para contadores terminados (fondo verde) */
         .finished {
             background-color: green;
+        }
+
+        .end-time {
+            font-size: 2em;
+        }
+        
+
+        .container {
+            display: flex;
+            justify-content: space-between;
+            border: 2px solid #000;
+            border-radius: 20px;
+            margin: 20px;
+        }
+
+        .column {
+            flex: 1;
+            border: 2px solid #000;
+            border-radius: 20px;
+            padding: 10px;
+        }
+
+        .column:nth-child(odd) {
+            background-color: #f2f2f2;
+        }
+
+        .column:nth-child(even) {
+            background-color: #e0e0e0;
+        }
+
+        .box {
+            border: 2px solid #000;
+            border-radius: 20px;
+            padding: 10px;
+        }
+
+        .minutes-input {
+            width: 100%; /* Ajusta el ancho del input para que ocupe todo el contenedor */
+            box-sizing: border-box; /* Incluye el padding en el ancho total del input */
+            border-radius: 5px;
+            margin: 4px;
+        }
+
+        /* Estilos para el botón */
+        .start-button {
+            display: inline-block;
+            padding: 10px;
+            font-size: 15px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        /* Estilos adicionales para dispositivos pequeños */
+        @media (max-width: 600px) {
+            .start-button {
+                font-size: 14px;
+                padding: 8px;
+            }
+        }
+
+        .start-button:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
