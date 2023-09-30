@@ -10,6 +10,9 @@
             padding: 5px;
             margin: 3px;
             width: 48%; /* El 48% asegura que haya un espacio mínimo entre las dos columnas */
+            border: 2px solid #000;
+            border-radius: 20px;
+            padding: 10px;
         }
 
         .clear {
@@ -54,12 +57,6 @@
             background-color: #e0e0e0;
         }
 
-        .box {
-            border: 2px solid #000;
-            border-radius: 20px;
-            padding: 10px;
-        }
-
         .minutes-input {
             width: 100%; /* Ajusta el ancho del input para que ocupe todo el contenedor */
             box-sizing: border-box; /* Incluye el padding en el ancho total del input */
@@ -96,7 +93,7 @@
 <body>
    <div class="container">
         <div class="column">
-    <div class="deposito box">
+    <div class="deposito">
         <label for="minutesInput1">Deposito 1 - V1:</label>
         <input type="number" id="minutesInput1" class="minutes-input" min="1" step="1" value="30">
         <button class="start-button" data-target="timer1">Iniciar remontado</button>
@@ -240,6 +237,15 @@
         <input type="checkbox" style="accent-color: red">Automatico
     </div>
 
+    <div class="deposito">
+        <label for="minutesInput32">Deposito 32:</label>
+        <input type="number" id="minutesInput32" class="minutes-input" min="1" step="1" value="40">
+        <button class="start-button" data-target="timer32">Iniciar remontado</button>
+        <div id="timer32" class="timer"></div>
+        <div id="endTime32" class="end-time"></div>
+         <input type="checkbox" style="accent-color: red">Automatico
+    </div>
+
 </div><!-- Fin div column -->
         <div class="clear"></div> <!-- Elemento clear para evitar que los elementos floten hacia abajo -->
 <div class="column">
@@ -379,14 +385,7 @@
         <input type="checkbox" style="accent-color: red">Automatico
     </div>
 
-     <div class="deposito">
-        <label for="minutesInput32">Deposito 32:</label>
-        <input type="number" id="minutesInput32" class="minutes-input" min="1" step="1" value="40">
-        <button class="start-button" data-target="timer32">Iniciar remontado</button>
-        <div id="timer32" class="timer"></div>
-        <div id="endTime32" class="end-time"></div>
-         <input type="checkbox" style="accent-color: red">Automatico
-    </div>
+   
 
     </div><!-- Fin div column -->
     </div><!-- Fin div container -->
