@@ -388,7 +388,7 @@
     </div><!-- Fin div column -->
     </div><!-- Fin div container -->
 
-<script>
+     <script>
         const startButtons = document.querySelectorAll(".start-button");
         const minutesInputs = document.querySelectorAll(".minutes-input");
 
@@ -450,6 +450,33 @@
                 }, 1000);
             });
         });
+
+        const toggleButtons = document.querySelectorAll(".toggle-button");
+
+    toggleButtons.forEach((button, index) => {
+        button.addEventListener("click", function () {
+            const timerDisplay = document.getElementById(button.getAttribute("data-target"));
+            const status = button.getAttribute("data-status");
+
+            if (status === "off") {
+                // Cambia la clase de la cuenta atrás a "active"
+                timerDisplay.classList.add("active");
+                // Actualiza el estado del botón a "encendido"
+                button.setAttribute("data-status", "on");
+                button.textContent = "Apagar";
+                // Inicia la cuenta atrás
+                startCountdown(index);
+            } else {
+                // Cambia la clase de la cuenta atrás a "finished"
+                timerDisplay.classList.add("finished");
+                // Actualiza el estado del botón a "apagado"
+                button.setAttribute("data-status", "off");
+                button.textContent = "Encender";
+                // Detén cualquier intervalo activo (si lo hay)
+                clearInterval(intervalId);
+            }
+        });
+    });
     </script>
 </body>
 </html>
