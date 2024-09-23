@@ -423,97 +423,131 @@
     </div><!-- Fin div column -->
     </div><!-- Fin div container -->
 
-     <script>
-         
+         <script>
+        const timers = {};
         const startButtons = document.querySelectorAll(".start-button");
+        const toggleButtons = document.querySelectorAll(".toggle-button");
         const minutesInputs = document.querySelectorAll(".minutes-input");
-
-        // Agregar un evento de confirmación antes de actualizar la página
-        window.onbeforeunload = function (e) {
-            if (contadoresActivos()) {
-                return "¿Estás seguro de que deseas reiniciar los contadores?";
-            }
+    
+        // Función para formatear minutos y segundos con dos dígitos
+        const formatTime = (time) => {
+            return time < 10 ? `0${time}` : time;
         };
-
-        function contadoresActivos() {
-            const timers = document.querySelectorAll(".timer");
-            for (const timer of timers) {
-                if (!timer.classList.contains("finished")) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
+    
+        // Confirmación antes de cerrar o recargar la página
+        window.addEventListener("beforeunload", function (event) {
+            // Este mensaje no se muestra directamente en todos los navegadores, pero algunos lo indican al salir.
+            event.preventDefault();
+            event.returnValue = ''; // Algunos navegadores necesitan este valor vacío para mostrar el mensaje
+            return ''; // Otros también pueden requerir un retorno explícito
+        });
+    
         startButtons.forEach((button, index) => {
             button.addEventListener("click", function () {
-                // Deshabilitar el botón para evitar que se inicie una cuenta atrás múltiples veces
                 this.disabled = true;
-
-                // Obtener el tiempo en minutos ingresado por el usuario
+                const timerId = button.getAttribute("data-target");
                 const minutosElegidos = parseInt(minutesInputs[index].value);
                 let segundosRestantes = minutosElegidos * 60;
-
-                const timerDisplay = document.getElementById(button.getAttribute("data-target"));
+    
+                const horaInicio = new Date();
+                const horaFinalizacion = new Date(horaInicio.getTime() + segundosRestantes * 1000);
+    
+                timers[timerId] = {
+                    intervalId: null,
+                    isPaused: false,
+                    timeRemaining: segundosRestantes,
+                    endTime: horaFinalizacion,
+                    pauseTime: 0 // Tiempo acumulado de pausas
+                };
+    
+                const timerDisplay = document.getElementById(timerId);
                 const endTimeDisplay = document.getElementById(`endTime${index + 1}`);
-
-                const audio = new Audio('Isabella_Late_Lp.mp3'); // Cambia 'alarma.mp3' por el nombre de tu archivo de sonido
-
-                // Calcular la hora de finalización
-                const horaFinalizacion = new Date();
-                horaFinalizacion.setMinutes(horaFinalizacion.getMinutes() + minutosElegidos);
-
-                const intervalId = setInterval(function () {
-                    const minutos = Math.floor(segundosRestantes / 60);
-                    const segundos = segundosRestantes % 60;
-
-                    timerDisplay.innerHTML = `${minutos}:${segundos < 10 ? '0' : ''}${segundos}`;
-
-                    if (segundosRestantes === 0) {
-                        clearInterval(intervalId);
+                const audio = new Audio('Isabella_Late_Lp.mp3');
+    
+                const updateTimer = () => {
+                    const minutos = Math.floor(timers[timerId].timeRemaining / 60);
+                    const segundos = timers[timerId].timeRemaining % 60;
+                    
+                    // Formatear minutos y segundos a dos dígitos
+                    timerDisplay.innerHTML = `${formatTime(minutos)}:${formatTime(segundos)}`;
+    
+                    if (timers[timerId].timeRemaining === 0) {
+                        clearInterval(timers[timerId].intervalId);
                         timerDisplay.innerHTML = "¡Tiempo agotado!";
-                        // Reproduce la alarma
                         audio.play();
-                        // Cambia la clase a "finished" para aplicar el estilo verde
                         timerDisplay.classList.add("finished");
                     } else {
-                        segundosRestantes--;
-                        // Actualizar la hora de finalización en cada ciclo
-                        endTimeDisplay.innerHTML = `Finaliza a las ${horaFinalizacion.getHours()}:${horaFinalizacion.getMinutes()}`;
-                        // Cambia la clase a "active" para aplicar el estilo rojo
+                        timers[timerId].timeRemaining--;
+    
+                        // Si no está pausado, recalcula la hora de finalización
+                        if (!timers[timerId].isPaused) {
+                            const tiempoRestante = timers[timerId].timeRemaining * 1000;
+                            timers[timerId].endTime = new Date(new Date().getTime() + tiempoRestante + timers[timerId].pauseTime);
+                        }
+    
+                        // Actualiza la visualización de la hora de finalización
+                        endTimeDisplay.innerHTML = `Finaliza a las ${formatTime(timers[timerId].endTime.getHours())}:${formatTime(timers[timerId].endTime.getMinutes())}`;
                         timerDisplay.classList.add("active");
                     }
-                }, 1000);
+                };
+    
+                timers[timerId].intervalId = setInterval(updateTimer, 1000);
             });
         });
-
-        const toggleButtons = document.querySelectorAll(".toggle-button");
-
-    toggleButtons.forEach((button, index) => {
-        button.addEventListener("click", function () {
-            const timerDisplay = document.getElementById(button.getAttribute("data-target"));
-            const status = button.getAttribute("data-status");
-
-            if (status === "off") {
-                // Cambia la clase de la cuenta atrás a "active"
-                timerDisplay.classList.add("active");
-                // Actualiza el estado del botón a "encendido"
-                button.setAttribute("data-status", "on");
-                button.textContent = "Apagar";
-                // Inicia la cuenta atrás
-                startCountdown(index);
-            } else {
-                // Cambia la clase de la cuenta atrás a "finished"
-                timerDisplay.classList.add("finished");
-                // Actualiza el estado del botón a "apagado"
-                button.setAttribute("data-status", "off");
-                button.textContent = "Encender";
-                // Detén cualquier intervalo activo (si lo hay)
-                clearInterval(intervalId);
-            }
+    
+        toggleButtons.forEach((button, index) => {
+            button.addEventListener("click", function () {
+                const timerId = button.getAttribute("data-target");
+                const status = button.getAttribute("data-status");
+    
+                if (status === "off") {
+                    // Pausar el temporizador
+                    clearInterval(timers[timerId].intervalId);
+                    timers[timerId].isPaused = true;
+                    button.setAttribute("data-status", "on");
+                    button.textContent = "Reanudar";
+    
+                    // Guarda el tiempo cuando se pausa
+                    timers[timerId].pauseTime = timers[timerId].endTime.getTime() - new Date().getTime();
+                } else {
+                    // Reanudar el temporizador
+                    const timerDisplay = document.getElementById(timerId);
+                    const endTimeDisplay = document.getElementById(`endTime${index + 1}`);
+    
+                    const updateTimer = () => {
+                        const minutos = Math.floor(timers[timerId].timeRemaining / 60);
+                        const segundos = timers[timerId].timeRemaining % 60;
+                        
+                        // Formatear minutos y segundos a dos dígitos
+                        timerDisplay.innerHTML = `${formatTime(minutos)}:${formatTime(segundos)}`;
+    
+                        if (timers[timerId].timeRemaining === 0) {
+                            clearInterval(timers[timerId].intervalId);
+                            timerDisplay.innerHTML = "¡Tiempo agotado!";
+                            const audio = new Audio('Isabella_Late_Lp.mp3');
+                            audio.play();
+                            timerDisplay.classList.add("finished");
+                        } else {
+                            timers[timerId].timeRemaining--;
+    
+                            // Si no está pausado, recalcula la hora de finalización
+                            if (!timers[timerId].isPaused) {
+                                const tiempoRestante = timers[timerId].timeRemaining * 1000;
+                                timers[timerId].endTime = new Date(new Date().getTime() + tiempoRestante + timers[timerId].pauseTime);
+                            }
+    
+                            endTimeDisplay.innerHTML = `Finaliza a las ${formatTime(timers[timerId].endTime.getHours())}:${formatTime(timers[timerId].endTime.getMinutes())}`;
+                            timerDisplay.classList.add("active");
+                        }
+                    };
+    
+                    timers[timerId].intervalId = setInterval(updateTimer, 1000);
+                    timers[timerId].isPaused = false;
+                    button.setAttribute("data-status", "off");
+                    button.textContent = "Pausar";
+                }
+            });
         });
-    });
-         
     </script>
 </body>
 </html>
