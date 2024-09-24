@@ -92,6 +92,8 @@
     
 </head>
 <body>
+    <!-- Botón para iniciar nueva sesión -->
+    <button id="new-session-button">Iniciar Nueva Sesión de Remontados</button>
    <div class="container">
         <div class="column">
     <div class="deposito">
@@ -423,24 +425,66 @@
     </div><!-- Fin div column -->
     </div><!-- Fin div container -->
 
-         <script>
+             <script>
         const timers = {};
         const startButtons = document.querySelectorAll(".start-button");
         const toggleButtons = document.querySelectorAll(".toggle-button");
         const minutesInputs = document.querySelectorAll(".minutes-input");
+        const newSessionButton = document.getElementById("new-session-button");
+    
+        const MAX_SESIONES = 3;
+        const NIGHT_SESSION_END = 2; // Hora límite (2:00) para considerar que es parte del día anterior
+        let currentSessionNumber = 1;
     
         // Función para formatear minutos y segundos con dos dígitos
         const formatTime = (time) => {
             return time < 10 ? `0${time}` : time;
         };
     
+        // Función para verificar si estamos en una sesión nocturna
+        const isNightSession = () => {
+            const currentHour = new Date().getHours();
+            return currentHour >= 23 || currentHour < NIGHT_SESSION_END;
+        };
+    
+        // Función para obtener la fecha correcta (considerando sesiones nocturnas)
+        const getCorrectDate = () => {
+            const today = new Date();
+            if (isNightSession()) {
+                today.setDate(today.getDate() - 1);
+            }
+            return `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
+        };
+    
+        // Función para manejar el identificador de sesión por día
+        const getSessionIdentifier = () => {
+            const date = getCorrectDate();
+            return `${date}_sesion${currentSessionNumber}`;
+        };
+    
         // Confirmación antes de cerrar o recargar la página
         window.addEventListener("beforeunload", function (event) {
-            // Este mensaje no se muestra directamente en todos los navegadores, pero algunos lo indican al salir.
             event.preventDefault();
-            event.returnValue = ''; // Algunos navegadores necesitan este valor vacío para mostrar el mensaje
-            return ''; // Otros también pueden requerir un retorno explícito
+            event.returnValue = ''; 
+            return '';
         });
+    
+        // Función para limpiar sesiones de días anteriores
+        const clearOldSessions = () => {
+            const today = new Date();
+            const currentDate = getCorrectDate();
+            const yesterday = new Date(today);
+            yesterday.setDate(today.getDate() - 1);
+            const formattedYesterday = `${yesterday.getFullYear()}-${yesterday.getMonth() + 1}-${yesterday.getDate()}`;
+    
+            for (const key in localStorage) {
+                if (!key.includes(currentDate) && !key.includes(formattedYesterday)) {
+                    localStorage.removeItem(key);
+                }
+            }
+        };
+    
+        clearOldSessions();
     
         startButtons.forEach((button, index) => {
             button.addEventListener("click", function () {
@@ -457,8 +501,11 @@
                     isPaused: false,
                     timeRemaining: segundosRestantes,
                     endTime: horaFinalizacion,
-                    pauseTime: 0 // Tiempo acumulado de pausas
+                    pauseTime: 0,
+                    pausedAt: null // Añadido: guardar el tiempo exacto en que se pausa
                 };
+    
+                localStorage.setItem(timerId, JSON.stringify(timers[timerId]));
     
                 const timerDisplay = document.getElementById(timerId);
                 const endTimeDisplay = document.getElementById(`endTime${index + 1}`);
@@ -467,13 +514,13 @@
                 const updateTimer = () => {
                     const minutos = Math.floor(timers[timerId].timeRemaining / 60);
                     const segundos = timers[timerId].timeRemaining % 60;
-                    
+    
                     // Formatear minutos y segundos a dos dígitos
                     timerDisplay.innerHTML = `${formatTime(minutos)}:${formatTime(segundos)}`;
     
                     if (timers[timerId].timeRemaining === 0) {
                         clearInterval(timers[timerId].intervalId);
-                        timerDisplay.innerHTML = "¡Tiempo agotado!";
+                        timerDisplay.innerHTML = "¡Remontado terminado!";
                         audio.play();
                         timerDisplay.classList.add("finished");
                     } else {
@@ -504,36 +551,34 @@
                     // Pausar el temporizador
                     clearInterval(timers[timerId].intervalId);
                     timers[timerId].isPaused = true;
+                    timers[timerId].pausedAt = new Date(); // Guardar la hora de pausa
                     button.setAttribute("data-status", "on");
-                    button.textContent = "Reanudar";
+                    button.textContent = "Reanudar Remontado";
     
-                    // Guarda el tiempo cuando se pausa
                     timers[timerId].pauseTime = timers[timerId].endTime.getTime() - new Date().getTime();
+                    localStorage.setItem(timerId, JSON.stringify(timers[timerId]));
                 } else {
-                    // Reanudar el temporizador
                     const timerDisplay = document.getElementById(timerId);
                     const endTimeDisplay = document.getElementById(`endTime${index + 1}`);
     
                     const updateTimer = () => {
                         const minutos = Math.floor(timers[timerId].timeRemaining / 60);
                         const segundos = timers[timerId].timeRemaining % 60;
-                        
-                        // Formatear minutos y segundos a dos dígitos
+    
                         timerDisplay.innerHTML = `${formatTime(minutos)}:${formatTime(segundos)}`;
     
                         if (timers[timerId].timeRemaining === 0) {
                             clearInterval(timers[timerId].intervalId);
-                            timerDisplay.innerHTML = "¡Tiempo agotado!";
+                            timerDisplay.innerHTML = "¡Remontado terminado!";
                             const audio = new Audio('Isabella_Late_Lp.mp3');
                             audio.play();
                             timerDisplay.classList.add("finished");
                         } else {
                             timers[timerId].timeRemaining--;
     
-                            // Si no está pausado, recalcula la hora de finalización
                             if (!timers[timerId].isPaused) {
                                 const tiempoRestante = timers[timerId].timeRemaining * 1000;
-                                timers[timerId].endTime = new Date(new Date().getTime() + tiempoRestante + timers[timerId].pauseTime);
+                                timers[timerId].endTime = new Date(new Date().getTime() + tiempoRestante);
                             }
     
                             endTimeDisplay.innerHTML = `Finaliza a las ${formatTime(timers[timerId].endTime.getHours())}:${formatTime(timers[timerId].endTime.getMinutes())}`;
@@ -541,13 +586,33 @@
                         }
                     };
     
-                    timers[timerId].intervalId = setInterval(updateTimer, 1000);
                     timers[timerId].isPaused = false;
+    
+                    // Recalcular la nueva hora de finalización al reanudar
+                    const now = new Date();
+                    const pauseDuration = now - timers[timerId].pausedAt;
+                    timers[timerId].endTime = new Date(timers[timerId].endTime.getTime() + pauseDuration);
+    
                     button.setAttribute("data-status", "off");
-                    button.textContent = "Pausar";
+                    button.textContent = "Pausar Remontado";
+                    timers[timerId].intervalId = setInterval(updateTimer, 1000);
+    
+                    localStorage.setItem(timerId, JSON.stringify(timers[timerId]));
                 }
             });
         });
+    
+        const restartSession = () => {
+            currentSessionNumber++;
+            if (currentSessionNumber > MAX_SESIONES) {
+                currentSessionNumber = 1;
+            }
+            localStorage.clear();
+            location.reload();
+        };
+    
+        newSessionButton.addEventListener("click", restartSession);
+    
     </script>
 </body>
 </html>
