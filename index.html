@@ -426,96 +426,161 @@
     </div><!-- Fin div container -->
 
     <script>
-         
+        const timers = {};
         const startButtons = document.querySelectorAll(".start-button");
+        const toggleButtons = document.querySelectorAll(".toggle-button");
         const minutesInputs = document.querySelectorAll(".minutes-input");
-
-        // Agregar un evento de confirmación antes de actualizar la página
-        window.onbeforeunload = function (e) {
-            if (contadoresActivos()) {
-                return "¿Estás seguro de que deseas reiniciar los contadores?";
-            }
+        const newSessionButton = document.getElementById("new-session-button");
+    
+        // Función para formatear minutos y segundos con dos dígitos
+        const formatTime = (time) => (time < 10 ? `0${time}` : time);
+    
+        // Guardar el estado de los remontados en el localStorage
+        const saveStateToLocalStorage = () => {
+            localStorage.setItem('timers', JSON.stringify(timers));
         };
-
-        function contadoresActivos() {
-            const timers = document.querySelectorAll(".timer");
-            for (const timer of timers) {
-                if (!timer.classList.contains("finished")) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        startButtons.forEach((button, index) => {
-            button.addEventListener("click", function () {
-                // Deshabilitar el botón para evitar que se inicie una cuenta atrás múltiples veces
-                this.disabled = true;
-
-                // Obtener el tiempo en minutos ingresado por el usuario
-                const minutosElegidos = parseInt(minutesInputs[index].value);
-                let segundosRestantes = minutosElegidos * 60;
-
-                const timerDisplay = document.getElementById(button.getAttribute("data-target"));
-                const endTimeDisplay = document.getElementById(`endTime${index + 1}`);
-
-                const audio = new Audio('Isabella_Late_Lp.mp3'); // Cambia 'alarma.mp3' por el nombre de tu archivo de sonido
-
-                // Calcular la hora de finalización
-                const horaFinalizacion = new Date();
-                horaFinalizacion.setMinutes(horaFinalizacion.getMinutes() + minutosElegidos);
-
-                const intervalId = setInterval(function () {
-                    const minutos = Math.floor(segundosRestantes / 60);
-                    const segundos = segundosRestantes % 60;
-
-                    timerDisplay.innerHTML = `${minutos}:${segundos < 10 ? '0' : ''}${segundos}`;
-
-                    if (segundosRestantes === 0) {
-                        clearInterval(intervalId);
-                        timerDisplay.innerHTML = "¡Tiempo agotado!";
-                        // Reproduce la alarma
-                        audio.play();
-                        // Cambia la clase a "finished" para aplicar el estilo verde
+    
+        // Cargar el estado desde el localStorage
+        const loadStateFromLocalStorage = () => {
+            const storedTimers = localStorage.getItem('timers');
+            if (storedTimers) {
+                const parsedTimers = JSON.parse(storedTimers);
+                Object.keys(parsedTimers).forEach(timerId => {
+                    timers[timerId] = parsedTimers[timerId];
+                    const timerDisplay = document.getElementById(timerId);
+                    const endTimeDisplay = document.getElementById(`endTime${timerId.replace("timer", "")}`);
+                    
+                    const now = Date.now();
+                    let remainingTime = (timers[timerId].endTime - now) / 1000;
+    
+                    if (remainingTime <= 0) {
+                        timerDisplay.innerHTML = "¡Remontado terminado!";
                         timerDisplay.classList.add("finished");
                     } else {
-                        segundosRestantes--;
-                        // Actualizar la hora de finalización en cada ciclo
-                        endTimeDisplay.innerHTML = `Finaliza a las ${horaFinalizacion.getHours()}:${horaFinalizacion.getMinutes()}`;
-                        // Cambia la clase a "active" para aplicar el estilo rojo
+                        timers[timerId].timeRemaining = remainingTime;
+                        const minutos = Math.floor(remainingTime / 60);
+                        const segundos = Math.floor(remainingTime % 60);
+    
+                        timerDisplay.innerHTML = `${formatTime(minutos)}:${formatTime(segundos)}`;
+                        endTimeDisplay.innerHTML = `Finaliza a las ${new Date(timers[timerId].endTime).toLocaleTimeString()}`;
                         timerDisplay.classList.add("active");
+    
+                        // Reiniciar el temporizador
+                        timers[timerId].intervalId = setInterval(() => updateTimer(timerId, timerDisplay, endTimeDisplay), 1000);
                     }
-                }, 1000);
-            });
-        });
-
-        const toggleButtons = document.querySelectorAll(".toggle-button");
-
-    toggleButtons.forEach((button, index) => {
-        button.addEventListener("click", function () {
-            const timerDisplay = document.getElementById(button.getAttribute("data-target"));
-            const status = button.getAttribute("data-status");
-
-            if (status === "off") {
-                // Cambia la clase de la cuenta atrás a "active"
-                timerDisplay.classList.add("active");
-                // Actualiza el estado del botón a "encendido"
-                button.setAttribute("data-status", "on");
-                button.textContent = "Apagar";
-                // Inicia la cuenta atrás
-                startCountdown(index);
-            } else {
-                // Cambia la clase de la cuenta atrás a "finished"
-                timerDisplay.classList.add("finished");
-                // Actualiza el estado del botón a "apagado"
-                button.setAttribute("data-status", "off");
-                button.textContent = "Encender";
-                // Detén cualquier intervalo activo (si lo hay)
-                clearInterval(intervalId);
+                });
             }
+        };
+    
+        // Función para actualizar el temporizador
+        const updateTimer = (timerId, timerDisplay, endTimeDisplay) => {
+            const now = Date.now();
+            let remainingTime = (timers[timerId].endTime - now) / 1000;
+    
+            if (remainingTime <= 0) {
+                clearInterval(timers[timerId].intervalId);
+                timerDisplay.innerHTML = "¡Remontado terminado!";
+                const audio = new Audio('Isabella_Late_Lp.mp3');
+                audio.play();
+                timerDisplay.classList.add("finished");
+            } else {
+                timers[timerId].timeRemaining = remainingTime;
+    
+                const minutos = Math.floor(remainingTime / 60);
+                const segundos = Math.floor(remainingTime % 60);
+    
+                timerDisplay.innerHTML = `${formatTime(minutos)}:${formatTime(segundos)}`;
+                endTimeDisplay.innerHTML = `Finaliza a las ${new Date(timers[timerId].endTime).toLocaleTimeString()}`;
+                timerDisplay.classList.add("active");
+            }
+        };
+    
+        // Función para iniciar el temporizador
+        const startTimer = (button, index) => {
+            button.disabled = true;
+            const timerId = button.getAttribute("data-target");
+            const minutosElegidos = parseInt(minutesInputs[index].value);
+            let segundosRestantes = minutosElegidos * 60;
+    
+            const horaInicio = Date.now(); // Hora actual en milisegundos
+            const horaFinalizacion = horaInicio + segundosRestantes * 1000;
+    
+            timers[timerId] = {
+                intervalId: null,
+                isPaused: false,
+                timeRemaining: segundosRestantes,
+                endTime: horaFinalizacion,
+                pauseTime: 0,
+                pausedAt: null
+            };
+    
+            const timerDisplay = document.getElementById(timerId);
+            const endTimeDisplay = document.getElementById(`endTime${index + 1}`);
+            const audio = new Audio('Isabella_Late_Lp.mp3');
+    
+            const updateTimerLocal = () => {
+                updateTimer(timerId, timerDisplay, endTimeDisplay);
+                saveStateToLocalStorage(); // Guardar estado cada segundo
+            };
+    
+            timers[timerId].intervalId = setInterval(updateTimerLocal, 1000);
+            saveStateToLocalStorage(); // Guardar estado al iniciar
+        };
+    
+        startButtons.forEach((button, index) => {
+            button.addEventListener("click", () => startTimer(button, index));
         });
-    });
-
+    
+        // Función para pausar o reanudar el temporizador
+        const toggleTimer = (button, index) => {
+            const timerId = button.getAttribute("data-target");
+            const status = button.getAttribute("data-status");
+    
+            if (status === "off") {
+                // Pausar el temporizador
+                clearInterval(timers[timerId].intervalId);
+                timers[timerId].isPaused = true;
+                timers[timerId].pausedAt = Date.now(); // Hora de pausa en milisegundos
+                button.setAttribute("data-status", "on");
+                button.textContent = "Reanudar Remontado";
+            } else {
+                // Reanudar el temporizador
+                const now = Date.now();
+                const pauseDuration = now - timers[timerId].pausedAt; // Calcular cuánto tiempo estuvo en pausa
+                timers[timerId].endTime += pauseDuration; // Ajustar la hora de finalización
+    
+                button.setAttribute("data-status", "off");
+                button.textContent = "Pausar Remontado";
+                timers[timerId].isPaused = false;
+    
+                const timerDisplay = document.getElementById(timerId);
+                const endTimeDisplay = document.getElementById(`endTime${index + 1}`);
+    
+                const updateTimerLocal = () => {
+                    updateTimer(timerId, timerDisplay, endTimeDisplay);
+                    saveStateToLocalStorage(); // Guardar estado cada segundo
+                };
+    
+                timers[timerId].intervalId = setInterval(updateTimerLocal, 1000);
+            }
+            saveStateToLocalStorage(); // Guardar estado al pausar/reanudar
+        };
+    
+        toggleButtons.forEach((button, index) => {
+            button.addEventListener("click", () => toggleTimer(button, index));
+        });
+    
+        // Reiniciar sesión y borrar localStorage
+        const restartSession = () => {
+            localStorage.clear(); // Borrar el localStorage antiguo
+            location.reload();
+        };
+    
+        newSessionButton.addEventListener("click", restartSession);
+    
+        // Cargar el estado desde el localStorage al cargar la página
+        loadStateFromLocalStorage();
+    
     </script>
 </body>
 </html>
