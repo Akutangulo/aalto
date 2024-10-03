@@ -5,89 +5,231 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aplicación para marcar los tiempos en los remontados - Temporizador de cuenta atrás</title>
     
-    <style>
-        
-        .deposito {
-            border-style: solid;
-            margin: 3px;
-            border: 2px solid #000;
-            border-radius: 20px;
-            padding: 10px;
-        }
+    <style>  
+/* Estilos base (mobile first) */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f9f3f4;
+    color: #4a0e1c;
+    margin: 0;
+    padding: 5px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
 
-        .clear {
-            clear: both; /* Añade un elemento con clear:both para evitar que los elementos floten hacia abajo */
-        }
+*, *:before, *:after {
+    box-sizing: inherit;
+}
 
-          /* Estilo para contadores activos (fondo rojo) */
-          .active {
-            background-color: red;
-        }
+.container {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    gap: 5px;
+    max-width: 100%;
+}
 
-        /* Estilo para contadores terminados (fondo verde) */
-        .finished {
-            background-color: green;
-        }
+.column {
+    flex: 0 0 calc(50% - 2.5px);
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 5px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
 
-        .end-time {
-            font-size: 2em;
-        }
-        
+.deposito {
+    background-color: #f5e6e8;
+    border: 1px solid #8c1c2c;
+    border-radius: 8px;
+    padding: 6px;
+    margin-bottom: 8px;
+}
 
-        .container {
-            display: flex;
-            justify-content: space-between;
-            border-radius: 20px;
-            margin: 20px;
-        }
+label {
+    display: block;
+    margin-bottom: 2px;
+    font-weight: bold;
+    color: #6b0f1a;
+    font-size: 12px;
+}
 
-        .column {
-            flex: 1;
-            border: 2px solid #000;
-            border-radius: 20px;
-            padding: 10px;
-            margin: 5px;
-        }
+.minutes-input {
+    width: 100%;
+    padding: 6px;
+    margin-bottom: 6px;
+    border: 1px solid #d4b6b9;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+    -moz-appearance: textfield;
+}
 
-        .column:nth-child(odd) {
-            background-color: #f2f2f2;
-        }
+.minutes-input::-webkit-outer-spin-button,
+.minutes-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
 
-        .column:nth-child(even) {
-            background-color: #e0e0e0;
-        }
+.start-button {
+    background-color: #8c1c2c;
+    color: white;
+    border: none;
+    padding: 8px;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    width: 100%;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    font-weight: bold;
+}
 
-        .minutes-input {
-            width: 100%; /* Ajusta el ancho del input para que ocupe todo el contenedor */
-            box-sizing: border-box; /* Incluye el padding en el ancho total del input */
-            border-radius: 5px;
-            margin: 4px;
-        }
+.start-button:hover, .start-button:active {
+    background-color: #6b0f1a;
+}
 
-        /* Estilos para el botón */
-        .start-button {
-            display: inline-block;
-            padding: 10px;
-            font-size: 15px;
-            background-color: #007BFF;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
+.timer, .end-time {
+    font-size: 14px;
+    font-weight: bold;
+    margin: 6px 0;
+    text-align: center;
+    color: #4a0e1c;
+}
 
-        /* Estilos adicionales para dispositivos pequeños */
-        @media (max-width: 600px) {
-            .start-button {
-                font-size: 14px;
-                padding: 8px;
-            }
-        }
+input[type="checkbox"] {
+    margin-right: 3px;
+}
 
-        .start-button:hover {
-            background-color: #0056b3;
-        }
+.toggle-button {
+    background-color: #d4b6b9;
+    color: #4a0e1c;
+    border: none;
+    padding: 6px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.toggle-button:hover, .toggle-button:active {
+    background-color: #c39ea3;
+}
+
+.active {
+    background-color: #ffdbd6;
+}
+
+.finished {
+    background-color: #d4edda;
+}
+
+#new-session-button {
+    background-color: #6b0f1a;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    width: 100%;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+#new-session-button:hover, #new-session-button:active {
+    background-color: #4a0e1c;
+}
+
+/* Media queries para pantallas más grandes */
+@media (min-width: 375px) {
+    body {
+        padding: 8px;
+    }
+
+    .deposito {
+        padding: 8px;
+        margin-bottom: 10px;
+    }
+
+    .start-button {
+        padding: 10px;
+        font-size: 16px;
+    }
+}
+
+@media (min-width: 480px) {
+    body {
+        padding: 10px;
+        font-size: 16px;
+    }
+
+    .container {
+        gap: 10px;
+    }
+
+    .column {
+        padding: 10px;
+    }
+
+    .deposito {
+        padding: 12px;
+        margin-bottom: 15px;
+    }
+
+    label {
+        font-size: 14px;
+    }
+
+    .minutes-input {
+        padding: 8px;
+        font-size: 16px;
+    }
+
+    .start-button {
+        padding: 12px;
+        font-size: 18px;
+    }
+
+    .timer, .end-time {
+        font-size: 16px;
+    }
+
+    .toggle-button {
+        padding: 8px 10px;
+        font-size: 14px;
+    }
+}
+
+@media (min-width: 768px) {
+    body {
+        padding: 15px;
+    }
+
+    .container {
+        gap: 15px;
+    }
+
+    .column {
+        padding: 15px;
+    }
+
+    .deposito {
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+
+    .start-button {
+        padding: 15px;
+        font-size: 20px;
+    }
+
+    .timer, .end-time {
+        font-size: 18px;
+    }
+}
     </style>
     
 </head>
@@ -103,7 +245,7 @@
         <div id="timer1" class="timer"></div>
         <div id="endTime1" class="end-time"></div> <!-- Elemento para mostrar la hora de finalización -->
         <input type="checkbox" style="accent-color: red">Automatico
-        <button class="toggle-button" data-target="timer1" data-status="off">Pausar Remontado</button> <!-- Botón de encender/apagar -->
+        <button class="toggle-button" data-target="timer1" data-status="off">Pausar/Reanudar</button> <!-- Botón de encender/apagar -->
     </div>
 
     <div class="deposito">
@@ -113,7 +255,7 @@
         <div id="timer2" class="timer"></div>
         <div id="endTime2" class="end-time"></div>
         <input type="checkbox" checked style="accent-color: red">Automatico
-        <button class="toggle-button" data-target="timer2" data-status="off">Pausar Remontado</button>
+        <button class="toggle-button" data-target="timer2" data-status="off">Pausar/Finalizar</button>
     </div>
 
     <div class="deposito">
@@ -123,7 +265,7 @@
         <div id="timer3" class="timer"></div>
         <div id="endTime3" class="end-time"></div>
         <input type="checkbox" checked style="accent-color: red">Automatico
-        <button class="toggle-button" data-target="timer3" data-status="off">Pausar Remontado</button>
+        <button class="toggle-button" data-target="timer3" data-status="off">Pausar/Finalizar</button>
     </div>
 
     <div class="deposito">
@@ -133,7 +275,7 @@
         <div id="timer4" class="timer"></div>
         <div id="endTime4" class="end-time"></div>
         <input type="checkbox" style="accent-color: red">Automatico
-        <button class="toggle-button" data-target="timer4" data-status="off">Pausar Remontado</button>
+        <button class="toggle-button" data-target="timer4" data-status="off">Pausar/Finalizar</button>
     </div>
 
     <div class="deposito">
@@ -143,7 +285,7 @@
         <div id="timer5" class="timer"></div>
         <div id="endTime5" class="end-time"></div>
         <input type="checkbox" style="accent-color: red">Automatico
-        <button class="toggle-button" data-target="timer5" data-status="off">Pausar Remontado</button>
+        <button class="toggle-button" data-target="timer5" data-status="off">Pausar/Finalizar</button>
     </div>
 
     <div class="deposito">
@@ -472,17 +614,18 @@
             }
         };
     
-        // Función para actualizar el temporizador
-        const updateTimer = (timerId, timerDisplay, endTimeDisplay) => {
+// Función para actualizar el temporizador
+const updateTimer = (timerId, timerDisplay, endTimeDisplay) => {
     const now = Date.now();
     let remainingTime = (timers[timerId].endTime - now) / 1000;
 
     if (remainingTime <= 0) {
         clearInterval(timers[timerId].intervalId);
         timerDisplay.innerHTML = "¡Remontado terminado!";
-        const audio = new Audio('Isabella_Late_Lp.mp3');
-        audio.play().catch(err => console.error("Error al reproducir el audio:", err));
         timerDisplay.classList.add("finished");
+        
+        // Intentar notificar al usuario de múltiples maneras
+        notifyUser(timerId);
     } else {
         const minutos = Math.floor(remainingTime / 60);
         const segundos = Math.floor(remainingTime % 60);
@@ -493,6 +636,33 @@
         endTimeDisplay.innerHTML = `Finaliza a las ${new Date(timers[timerId].endTime).toLocaleTimeString([], options)}`;
         
         timerDisplay.classList.add("active");
+    }
+};
+
+// Nueva función para notificar al usuario
+const notifyUser = (timerId) => {
+    // Intentar vibrar (si el dispositivo lo soporta)
+    if ('vibrate' in navigator) {
+        navigator.vibrate([200, 100, 200]);
+    }
+
+    // Intentar reproducir el sonido varias veces
+    const playSound = () => {
+        const audio = new Audio('Isabella_Late_Lp.mp3');
+        audio.play().catch(err => console.error("Error al reproducir el audio:", err));
+    };
+
+    playSound();
+
+    // Mostrar una notificación persistente
+    if ('Notification' in window && Notification.permission === 'granted') {
+        const notification = new Notification('Remontado Terminado', {
+            body: `El remontado del depósito ${timerId.replace("timer", "")} ha terminado.`,
+            requireInteraction: true  // Hace que la notificación sea persistente
+        });
+
+        // Cerrar la notificación después de 1 minuto
+        setTimeout(() => notification.close(), 60000);
     }
 };
     
@@ -581,6 +751,14 @@
     
         // Cargar el estado desde el localStorage al cargar la página
         loadStateFromLocalStorage();
+
+        // Solicitar permiso para notificaciones al cargar la página
+document.addEventListener('DOMContentLoaded', () => {
+    loadStateFromLocalStorage();
+    if ('Notification' in window) {
+        Notification.requestPermission();
+    }
+});
     
     </script>
 </body>
