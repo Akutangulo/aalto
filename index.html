@@ -6,43 +6,50 @@
     <title>Aplicación para marcar los tiempos en los remontados - Temporizador de cuenta atrás</title>
     
     <style>  
-/* Estilos base (mobile first) */
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f9f3f4;
-    color: #4a0e1c;
-    margin: 0;
-    padding: 5px;
-    font-size: 14px;
-    box-sizing: border-box;
-}
+        .deposito {
+            background-color: #f5e6e8;
+            border: 1px solid #8c1c2c;
+            border-radius: 8px;
+            padding: 6px;
+            margin-bottom: 8px;
+        }
 
-*, *:before, *:after {
-    box-sizing: inherit;
-}
+        .clear {
+            clear: both; /* Añade un elemento con clear:both para evitar que los elementos floten hacia abajo */
+        }
 
-.container {
-    display: flex;
-    flex-wrap: nowrap;
-    justify-content: space-between;
-    gap: 5px;
-    max-width: 100%;
-}
+          /* Estilo para contadores activos (fondo rojo) */
+          .active {
+            background-color: #39e34d;
+        }
 
-.column {
+        .timer {
+            font-size: 1.5rem;
+        }
+        
+        /* Estilo para contadores terminados (fondo verde) */
+        .finished {
+            background-color: #d4edda;
+        }
+
+        .end-time {
+            font-size: 2em;
+        }
+        
+
+        .container {
+            display: flex;
+            justify-content: space-between;
+            border-radius: 20px;
+            margin: 20px;
+        }
+
+        .column {
     flex: 0 0 calc(50% - 2.5px);
     background-color: #ffffff;
     border-radius: 8px;
     padding: 5px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-}
-
-.deposito {
-    background-color: #f5e6e8;
-    border: 1px solid #8c1c2c;
-    border-radius: 8px;
-    padding: 6px;
-    margin-bottom: 8px;
 }
 
 label {
@@ -53,24 +60,25 @@ label {
     font-size: 12px;
 }
 
-.minutes-input {
-    width: 100%;
-    padding: 6px;
-    margin-bottom: 6px;
-    border: 1px solid #d4b6b9;
-    border-radius: 4px;
-    font-size: 14px;
-    box-sizing: border-box;
-    -moz-appearance: textfield;
-}
+        .minutes-input {
+            width: 100%;
+            padding: 6px;
+            margin-bottom: 6px;
+            border: 1px solid #d4b6b9;
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+            appearance: textfield;
+        }
 
-.minutes-input::-webkit-outer-spin-button,
-.minutes-input::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
+        .minutes-input::-webkit-outer-spin-button,
+        .minutes-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
 
-.start-button {
+        /* Estilos para el botón */
+        .start-button {
     background-color: #8c1c2c;
     color: white;
     border: none;
@@ -89,147 +97,36 @@ label {
     background-color: #6b0f1a;
 }
 
-.timer, .end-time {
-    font-size: 14px;
-    font-weight: bold;
-    margin: 6px 0;
-    text-align: center;
-    color: #4a0e1c;
-}
+        #new-session-button {
+            background-color: #6b0f1a;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            width: 100%;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
 
-input[type="checkbox"] {
-    margin-right: 3px;
-}
+        #new-session-button:hover, #new-session-button:active {
+            background-color: #4a0e1c;
+        }
 
-.toggle-button {
-    background-color: #d4b6b9;
-    color: #4a0e1c;
-    border: none;
-    padding: 6px 8px;
-    border-radius: 4px;
-    font-size: 12px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
+        /* Estilos adicionales para dispositivos pequeños */
+        @media (max-width: 600px) {
+            .start-button {
+                font-size: 14px;
+                padding: 8px;
+            }
+        }
 
-.toggle-button:hover, .toggle-button:active {
-    background-color: #c39ea3;
-}
-
-.active {
-    background-color: #ffdbd6;
-}
-
-.finished {
-    background-color: #d4edda;
-}
-
-#new-session-button {
-    background-color: #6b0f1a;
-    color: white;
-    border: none;
-    padding: 10px;
-    border-radius: 4px;
-    font-size: 14px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-    width: 100%;
-    margin-bottom: 12px;
-    text-transform: uppercase;
-    font-weight: bold;
-}
-
-#new-session-button:hover, #new-session-button:active {
-    background-color: #4a0e1c;
-}
-
-/* Media queries para pantallas más grandes */
-@media (min-width: 375px) {
-    body {
-        padding: 8px;
-    }
-
-    .deposito {
-        padding: 8px;
-        margin-bottom: 10px;
-    }
-
-    .start-button {
-        padding: 10px;
-        font-size: 16px;
-    }
-}
-
-@media (min-width: 480px) {
-    body {
-        padding: 10px;
-        font-size: 16px;
-    }
-
-    .container {
-        gap: 10px;
-    }
-
-    .column {
-        padding: 10px;
-    }
-
-    .deposito {
-        padding: 12px;
-        margin-bottom: 15px;
-    }
-
-    label {
-        font-size: 14px;
-    }
-
-    .minutes-input {
-        padding: 8px;
-        font-size: 16px;
-    }
-
-    .start-button {
-        padding: 12px;
-        font-size: 18px;
-    }
-
-    .timer, .end-time {
-        font-size: 16px;
-    }
-
-    .toggle-button {
-        padding: 8px 10px;
-        font-size: 14px;
-    }
-}
-
-@media (min-width: 768px) {
-    body {
-        padding: 15px;
-    }
-
-    .container {
-        gap: 15px;
-    }
-
-    .column {
-        padding: 15px;
-    }
-
-    .deposito {
-        padding: 15px;
-        margin-bottom: 20px;
-    }
-
-    .start-button {
-        padding: 15px;
-        font-size: 20px;
-    }
-
-    .timer, .end-time {
-        font-size: 18px;
-    }
-}
+        .start-button:hover {
+            background-color: #0056b3;
+        }
     </style>
     
 </head>
@@ -245,7 +142,7 @@ input[type="checkbox"] {
         <div id="timer1" class="timer"></div>
         <div id="endTime1" class="end-time"></div> <!-- Elemento para mostrar la hora de finalización -->
         <input type="checkbox" style="accent-color: red">Automatico
-        <button class="toggle-button" data-target="timer1" data-status="off">Pausar Remontado</button> <!-- Botón de encender/apagar -->
+        <button class="toggle-button" data-target="timer1" data-status="off">Pausar/Reanudar</button> <!-- Botón de encender/apagar -->
     </div>
 
     <div class="deposito">
@@ -255,7 +152,7 @@ input[type="checkbox"] {
         <div id="timer2" class="timer"></div>
         <div id="endTime2" class="end-time"></div>
         <input type="checkbox" checked style="accent-color: red">Automatico
-        <button class="toggle-button" data-target="timer2" data-status="off">Pausar Remontado</button>
+        <button class="toggle-button" data-target="timer2" data-status="off">Pausar/Finalizar</button>
     </div>
 
     <div class="deposito">
@@ -265,7 +162,7 @@ input[type="checkbox"] {
         <div id="timer3" class="timer"></div>
         <div id="endTime3" class="end-time"></div>
         <input type="checkbox" checked style="accent-color: red">Automatico
-        <button class="toggle-button" data-target="timer3" data-status="off">Pausar Remontado</button>
+        <button class="toggle-button" data-target="timer3" data-status="off">Pausar/Finalizar</button>
     </div>
 
     <div class="deposito">
@@ -639,14 +536,24 @@ const updateTimer = (timerId, timerDisplay, endTimeDisplay) => {
     }
 };
 
-// Nueva función para notificar al usuario
-const notifyUser = (timerId) => {
-    // Intentar vibrar (si el dispositivo lo soporta)
-    if ('vibrate' in navigator) {
-        navigator.vibrate([200, 100, 200]);
-    }
+// Registrar el Service Worker
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('service-worker.js')
+        .then(registration => console.log('Service Worker registrado'))
+        .catch(error => console.log('Error al registrar el Service Worker:', error));
+}
 
-    // Intentar reproducir el sonido varias veces
+// Función para notificar al usuario
+const notifyUser = (timerId) => {
+    // Intentar vibrar repetidamente
+    const vibrateRepeatedly = () => {
+        if ('vibrate' in navigator) {
+            navigator.vibrate([300, 150, 500]);
+            setTimeout(vibrateRepeatedly, 1000);
+        }
+    };
+
+    // Reproducir sonido
     const playSound = () => {
         const audio = new Audio('Isabella_Late_Lp.mp3');
         audio.play().catch(err => console.error("Error al reproducir el audio:", err));
@@ -654,15 +561,16 @@ const notifyUser = (timerId) => {
 
     playSound();
 
-    // Mostrar una notificación persistente
+    // Mostrar notificación
     if ('Notification' in window && Notification.permission === 'granted') {
-        const notification = new Notification('Remontado Terminado', {
-            body: `El remontado del depósito ${timerId.replace("timer", "")} ha terminado.`,
-            requireInteraction: true  // Hace que la notificación sea persistente
+        // Usar el Service Worker para mostrar la notificación
+        navigator.serviceWorker.ready.then(registration => {
+            registration.showNotification('Remontado listo para la muestra', {
+                body: `El remontado del depósito ${timerId.replace("timer", "")} va a finalizar, es hora de tomar la muestra.`,
+                vibrate: [300, 150, 500],
+                requireInteraction: true
+            });
         });
-
-        // Cerrar la notificación después de 1 minuto
-        setTimeout(() => notification.close(), 60000);
     }
 };
     
