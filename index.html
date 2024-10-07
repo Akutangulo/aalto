@@ -6,13 +6,33 @@
     <title>Aplicación para marcar los tiempos en los remontados - Temporizador de cuenta atrás</title>
     
     <style>  
-        .deposito {
+        /* Estilos base (mobile first) */
+      .deposito {
             background-color: #f5e6e8;
             border: 1px solid #8c1c2c;
             border-radius: 8px;
-            padding: 6px;
+            padding: 7px;
             margin-bottom: 8px;
         }
+
+        .deposito.vacio {
+    background-color: #e0e0e0; /* Fondo gris claro */
+    border: 1px solid #b0b0b0; /* Borde gris medio */
+    color: #808080; /* Texto gris oscuro */
+    opacity: 0.7; /* Difuminar el contenido ligeramente */
+}
+
+.deposito.vacio input,
+.deposito.vacio button,
+.deposito.vacio label,
+.deposito.vacio .timer,
+.deposito.vacio .end-time {
+    color: #2e2e2e; /* Texto gris oscuro para los elementos dentro del depósito */
+    background-color: #f0f0f0; /* Fondo gris muy claro para los elementos dentro del depósito */
+    border-color: #b0b0b0; /* Borde gris medio para los elementos dentro del depósito */
+    opacity: 0.7; /* Difuminar los elementos dentro del depósito ligeramente */
+}
+
 
         .clear {
             clear: both; /* Añade un elemento con clear:both para evitar que los elementos floten hacia abajo */
@@ -25,6 +45,11 @@
 
         .timer {
             font-size: 1.5rem;
+            text-align: center;
+            border-radius: 8px;
+            background-color: #39e34d;
+            border: 1px solid #f5e6e8;
+            font-weight:900;
         }
         
         /* Estilo para contadores terminados (fondo verde) */
@@ -34,6 +59,9 @@
 
         .end-time {
             font-size: 2em;
+            text-align: center;
+            border-radius: 8px;
+            background-color: #39e34d
         }
         
 
@@ -41,7 +69,7 @@
             display: flex;
             justify-content: space-between;
             border-radius: 20px;
-            margin: 20px;
+            margin: 10px;
         }
 
         .column {
@@ -56,8 +84,8 @@ label {
     display: block;
     margin-bottom: 2px;
     font-weight: bold;
-    color: #6b0f1a;
-    font-size: 12px;
+    color: black;
+    font-size: 1.2rem;
 }
 
         .minutes-input {
@@ -84,7 +112,7 @@ label {
     border: none;
     padding: 8px;
     border-radius: 4px;
-    font-size: 14px;
+    font-size: 1.2rem;
     cursor: pointer;
     transition: background-color 0.3s;
     width: 100%;
@@ -94,7 +122,26 @@ label {
 }
 
 .start-button:hover, .start-button:active {
-    background-color: #6b0f1a;
+    background-color: #0056b3;
+}
+
+input[type="checkbox"] {
+    margin: 5px;
+}
+
+.toggle-button {
+    background-color: #d4b6b9;
+    border: none;
+    padding: 6px 8px;
+    margin: 10px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.toggle-button:hover, .toggle-button:active {
+    background-color: #c39ea3;
 }
 
         #new-session-button {
@@ -116,17 +163,6 @@ label {
             background-color: #4a0e1c;
         }
 
-        /* Estilos adicionales para dispositivos pequeños */
-        @media (max-width: 600px) {
-            .start-button {
-                font-size: 14px;
-                padding: 8px;
-            }
-        }
-
-        .start-button:hover {
-            background-color: #0056b3;
-        }
     </style>
     
 </head>
@@ -136,332 +172,363 @@ label {
    <div class="container">
         <div class="column">
     <div class="deposito">
-        <label for="minutesInput1">Deposito 1 - V1:</label>
+        <label for="minutesInput1">Deposito 1</label>
         <input type="number" id="minutesInput1" class="minutes-input" min="1" step="1" value="30">
         <button class="start-button" data-target="timer1">Iniciar remontado</button>
         <div id="timer1" class="timer"></div>
         <div id="endTime1" class="end-time"></div> <!-- Elemento para mostrar la hora de finalización -->
-        <input type="checkbox" style="accent-color: red">Automatico
+        <input type="checkbox" id="automatico1" style="accent-color: red">Automático<br/>
+        <input type="checkbox" id="aireado1" style="accent-color: blue">Aireado<br/>
         <button class="toggle-button" data-target="timer1" data-status="off">Pausar Remontado</button> <!-- Botón de encender/apagar -->
     </div>
 
     <div class="deposito">
-        <label for="minutesInput2">Deposito 2 - H4:</label>
+        <label for="minutesInput2">Deposito 2</label>
         <input type="number" id="minutesInput2" class="minutes-input" min="1" step="1" value="30">
         <button class="start-button" data-target="timer2">Iniciar remontado</button>
         <div id="timer2" class="timer"></div>
         <div id="endTime2" class="end-time"></div>
-        <input type="checkbox" checked style="accent-color: red">Automatico
+        <input type="checkbox" id="automatico2" style="accent-color: red">Automático<br/>
+        <input type="checkbox" id="aireado2" style="accent-color: blue">Aireado<br/>
         <button class="toggle-button" data-target="timer2" data-status="off">Pausar Remontado</button>
     </div>
 
     <div class="deposito">
-        <label for="minutesInput3">Deposito 3 - H5:</label>
+        <label for="minutesInput3">Deposito 3</label>
         <input type="number" id="minutesInput3" class="minutes-input" min="1" step="1" value="30">
         <button class="start-button" data-target="timer3">Iniciar remontado</button>
         <div id="timer3" class="timer"></div>
         <div id="endTime3" class="end-time"></div>
-        <input type="checkbox" checked style="accent-color: red">Automatico
+        <input type="checkbox" id="automatico3" style="accent-color: red">Automático<br/>
+        <input type="checkbox" id="aireado3" style="accent-color: blue">Aireado<br/>
         <button class="toggle-button" data-target="timer3" data-status="off">Pausar Remontado</button>
     </div>
 
     <div class="deposito">
-        <label for="minutesInput4">Deposito 4 - H6:</label>
+        <label for="minutesInput4">Deposito 4</label>
         <input type="number" id="minutesInput4" class="minutes-input" min="1" step="1" value="30">
         <button class="start-button" data-target="timer4">Iniciar remontado</button>
         <div id="timer4" class="timer"></div>
         <div id="endTime4" class="end-time"></div>
-        <input type="checkbox" style="accent-color: red">Automatico
+        <input type="checkbox" id="automatico4" style="accent-color: red">Automático<br/>
+        <input type="checkbox" id="aireado4" style="accent-color: blue">Aireado<br/>
         <button class="toggle-button" data-target="timer4" data-status="off">Pausar Remontado</button>
     </div>
 
     <div class="deposito">
-        <label for="minutesInput5">Deposito 5 - BD1:</label>
+        <label for="minutesInput5">Deposito 5</label>
         <input type="number" id="minutesInput5" class="minutes-input" min="1" step="1" value="30">
         <button class="start-button" data-target="timer5">Iniciar remontado</button>
         <div id="timer5" class="timer"></div>
         <div id="endTime5" class="end-time"></div>
-        <input type="checkbox" style="accent-color: red">Automatico
-        <button class="toggle-button" data-target="timer5" data-status="off">Pausar/Finalizar</button>
+        <input type="checkbox" id="automatico5" style="accent-color: red">Automático<br/>
+        <input type="checkbox" id="aireado5" style="accent-color: blue">Aireado<br/>
+        <button class="toggle-button" data-target="timer5" data-status="off">Pausar Remontado</button>
     </div>
 
     <div class="deposito">
-        <label for="minutesInput6">Deposito 6: - P3</label>
+        <label for="minutesInput6">Deposito 6</label>
         <input type="number" id="minutesInput6" class="minutes-input" min="1" step="1" value="30">
         <button class="start-button" data-target="timer6">Iniciar remontado</button>
         <div id="timer6" class="timer"></div>
         <div id="endTime6" class="end-time"></div>
-        <input type="checkbox" checked style="accent-color: red">Automatico
-        <button class="toggle-button" data-target="timer6" data-status="off">Pausar/Finalizar</button>
+        <input type="checkbox" id="automatico6" style="accent-color: red">Automático<br/>
+        <input type="checkbox" id="aireado6" style="accent-color: blue">Aireado<br/>
+        <button class="toggle-button" data-target="timer6" data-status="off">Pausar Remontado</button>
     </div>
     
      <div class="deposito">
-        <label for="minutesInput7">Deposito 7:</label>
+        <label for="minutesInput7">Deposito 7</label>
         <input type="number" id="minutesInput7" class="minutes-input" min="1" step="1" value="30">
         <button class="start-button" data-target="timer7">Iniciar remontado</button>
         <div id="timer7" class="timer"></div>
          <div id="endTime7" class="end-time"></div>
-         <input type="checkbox" checked style="accent-color: red">Automatico
-         <button class="toggle-button" data-target="timer7" data-status="off">Pausar/Finalizar</button>
+         <input type="checkbox" id="automatico7" style="accent-color: red">Automático<br/>
+        <input type="checkbox" id="aireado7" style="accent-color: blue">Aireado<br/>
+         <button class="toggle-button" data-target="timer7" data-status="off">Pausar Remontado</button>
     </div>
 
      <div class="deposito">
-        <label for="minutesInput8">Deposito 8:</label>
+        <label for="minutesInput8">Deposito 8</label>
         <input type="number" id="minutesInput8" class="minutes-input" min="1" step="1" value="30">
         <button class="start-button" data-target="timer8">Iniciar remontado</button>
         <div id="timer8" class="timer"></div>
          <div id="endTime8" class="end-time"></div>
-         <input type="checkbox" style="accent-color: red">Automatico
-         <button class="toggle-button" data-target="timer8" data-status="off">Pausar/Finalizar</button>
+         <input type="checkbox" id="automatico8" style="accent-color: red">Automático<br/>
+        <input type="checkbox" id="aireado8" style="accent-color: blue">Aireado<br/>
+         <button class="toggle-button" data-target="timer8" data-status="off">Pausar Remontado</button>
     </div>
 
-     <div class="deposito">
-        <label for="minutesInput9">Deposito 9:</label>
+     <div class="deposito vacio">
+        <label for="minutesInput9">Deposito 9</label>
         <input type="number" id="minutesInput9" class="minutes-input" min="1" step="1" value="30">
         <button class="start-button" data-target="timer9">Iniciar remontado</button>
         <div id="timer9" class="timer"></div>
          <div id="endTime9" class="end-time"></div>
-         <input type="checkbox" style="accent-color: red">Automatico
-         <button class="toggle-button" data-target="timer9" data-status="off">Pausar/Finalizar</button>
+         <input type="checkbox" id="automatico9" style="accent-color: red">Automático<br/>
+        <input type="checkbox" id="aireado9" style="accent-color: blue">Aireado<br/>
+         <button class="toggle-button" data-target="timer9" data-status="off">Pausar Remontado</button>
     </div>
 
-     <div class="deposito">
-        <label for="minutesInput10">Deposito 10:</label>
+     <div class="deposito vacio">
+        <label for="minutesInput10">Deposito 10</label>
         <input type="number" id="minutesInput10" class="minutes-input" min="1" step="1" value="30">
         <button class="start-button" data-target="timer10">Iniciar remontado</button>
         <div id="timer10" class="timer"></div>
          <div id="endTime10" class="end-time"></div>
-         <input type="checkbox" style="accent-color: red">Automatico
-         <button class="toggle-button" data-target="timer10" data-status="off">Pausar/Finalizar</button>
+         <input type="checkbox" id="automatico10" style="accent-color: red">Automático<br/>
+        <input type="checkbox" id="aireado10" style="accent-color: blue">Aireado<br/>
+         <button class="toggle-button" data-target="timer10" data-status="off">Pausar Remontado</button>
     </div>
 
-    <div class="deposito">
-        <label for="minutesInput11">Deposito 11 - F1:</label>
+    <div class="deposito vacio">
+        <label for="minutesInput11">Deposito 11</label>
         <input type="number" id="minutesInput11" class="minutes-input" min="1" step="1" value="30">
         <button class="start-button" data-target="timer11">Iniciar remontado</button>
         <div id="timer11" class="timer"></div>
         <div id="endTime11" class="end-time"></div>
-        <input type="checkbox" style="accent-color: red">Automatico
-        <button class="toggle-button" data-target="timer11" data-status="off">Pausar/Finalizar</button>
+        <input type="checkbox" id="automatico11" style="accent-color: red">Automático<br/>
+        <input type="checkbox" id="aireado11" style="accent-color: blue">Aireado<br/>
+        <button class="toggle-button" data-target="timer11" data-status="off">Pausar Remontado</button>
     </div>
 
     <div class="deposito">
-        <label for="minutesInput12">Deposito 12 - H3:</label>
+        <label for="minutesInput12">Deposito 12</label>
         <input type="number" id="minutesInput12" class="minutes-input" min="1" step="1" value="30">
         <button class="start-button" data-target="timer12">Iniciar remontado</button>
         <div id="timer12" class="timer"></div>
         <div id="endTime12" class="end-time"></div>
-        <input type="checkbox" style="accent-color: red">Automatico
-        <button class="toggle-button" data-target="timer12" data-status="off">Pausar/Finalizar</button>
+        <input type="checkbox" id="automatico12" style="accent-color: red">Automático<br/>
+        <input type="checkbox" id="aireado12" style="accent-color: blue">Aireado<br/>
+        <button class="toggle-button" data-target="timer12" data-status="off">Pausar Remontado</button>
     </div>
 
     <div class="deposito">
-        <label for="minutesInput13">Deposito 13 - H2:</label>
+        <label for="minutesInput13">Deposito 13</label>
         <input type="number" id="minutesInput13" class="minutes-input" min="1" step="1" value="30">
         <button class="start-button" data-target="timer13">Iniciar remontado</button>
         <div id="timer13" class="timer"></div>
         <div id="endTime13" class="end-time"></div>
-        <input type="checkbox" style="accent-color: red">Automatico
-        <button class="toggle-button" data-target="timer13" data-status="off">Pausar/Finalizar</button>
+        <input type="checkbox" id="automatico13" style="accent-color: red">Automático<br/>
+        <input type="checkbox" id="aireado13" style="accent-color: blue">Aireado<br/>
+        <button class="toggle-button" data-target="timer13" data-status="off">Pausar Remontado</button>
     </div>
 
     <div class="deposito">
-        <label for="minutesInput14">Deposito 14 - H1:</label>
+        <label for="minutesInput14">Deposito 14</label>
         <input type="number" id="minutesInput14" class="minutes-input" min="1" step="1" value="30">
         <button class="start-button" data-target="timer14">Iniciar remontado</button>
         <div id="timer14" class="timer"></div>
         <div id="endTime14" class="end-time"></div>
-        <input type="checkbox" style="accent-color: red">Automatico
-        <button class="toggle-button" data-target="timer14" data-status="off">Pausar/Finalizar</button>
+        <input type="checkbox" id="automatico14" style="accent-color: red">Automático<br/>
+        <input type="checkbox" id="aireado14" style="accent-color: blue">Aireado<br/>
+        <button class="toggle-button" data-target="timer14" data-status="off">Pausar Remontado</button>
     </div>
 
     <div class="deposito">
-        <label for="minutesInput15">Deposito 15 - M1:</label>
+        <label for="minutesInput15">Deposito 15</label>
         <input type="number" id="minutesInput15" class="minutes-input" min="1" step="1" value="40">
         <button class="start-button" data-target="timer15">Iniciar remontado</button>
         <div id="timer15" class="timer"></div>
         <div id="endTime15" class="end-time"></div>
-        <input type="checkbox" style="accent-color: red">Automatico
-        <button class="toggle-button" data-target="timer15" data-status="off">Pausar/Finalizar</button>
+        <input type="checkbox" id="automatico15" style="accent-color: red">Automático<br/>
+        <input type="checkbox" id="aireado15" style="accent-color: blue">Aireado<br/>
+        <button class="toggle-button" data-target="timer15" data-status="off">Pausar Remontado</button>
     </div>
 
     <div class="deposito">
-        <label for="minutesInput16">Deposito 16 - P2:</label>
+        <label for="minutesInput16">Deposito 16</label>
         <input type="number" id="minutesInput16" class="minutes-input" min="1" step="1" value="40">
         <button class="start-button" data-target="timer16">Iniciar remontado</button>
         <div id="timer16" class="timer"></div>
         <div id="endTime16" class="end-time"></div>
-        <input type="checkbox" style="accent-color: red">Automatico
-        <button class="toggle-button" data-target="timer16" data-status="off">Pausar/Finalizar</button>
+        <input type="checkbox" id="automatico16" style="accent-color: red">Automático<br/>
+        <input type="checkbox" id="aireado16" style="accent-color: blue">Aireado<br/>
+        <button class="toggle-button" data-target="timer16" data-status="off">Pausar Remontado</button>
     </div>
 
-  
-
 </div><!-- Fin div column -->
-        <div class="clear"></div> <!-- Elemento clear para evitar que los elementos floten hacia abajo -->
+       
 <div class="column">
     
      <div class="deposito">
-        <label for="minutesInput17">Deposito 17 - A1:</label>
+        <label for="minutesInput17">Deposito 17</label>
         <input type="number" id="minutesInput17" class="minutes-input" min="1" step="1" value="30">
         <button class="start-button" data-target="timer17">Iniciar remontado</button>
         <div id="timer17" class="timer"></div>
          <div id="endTime17" class="end-time"></div>
-         <input type="checkbox" style="accent-color: red">Automatico
-         <button class="toggle-button" data-target="timer17" data-status="off">Pausar/Finalizar</button>
+         <input type="checkbox" id="automatico17" style="accent-color: red">Automático<br/>
+        <input type="checkbox" id="aireado17" style="accent-color: blue">Aireado<br/>
+         <button class="toggle-button" data-target="timer17" data-status="off">Pausar Remontado</button>
     </div>
 
      <div class="deposito">
-        <label for="minutesInput18">Deposito 18 - A2:</label>
+        <label for="minutesInput18">Deposito 18</label>
         <input type="number" id="minutesInput18" class="minutes-input" min="1" step="1" value="30">
         <button class="start-button" data-target="timer18">Iniciar remontado</button>
         <div id="timer18" class="timer"></div>
          <div id="endTime18" class="end-time"></div>
-         <input type="checkbox" style="accent-color: red">Automatico
-         <button class="toggle-button" data-target="timer18" data-status="off">Pausar/Finalizar</button>
+         <input type="checkbox" id="automatico18" style="accent-color: red">Automático<br/>
+        <input type="checkbox" id="aireado18" style="accent-color: blue">Aireado<br/>
+         <button class="toggle-button" data-target="timer18" data-status="off">Pausar Remontado</button>
     </div>
 
      <div class="deposito">
-        <label for="minutesInput19">Deposito 19 - A3:</label>
+        <label for="minutesInput19">Deposito 19</label>
         <input type="number" id="minutesInput19" class="minutes-input" min="1" step="1" value="30">
         <button class="start-button" data-target="timer19">Iniciar remontado</button>
         <div id="timer19" class="timer"></div>
          <div id="endTime19" class="end-time"></div>
-         <input type="checkbox" style="accent-color: red">Automatico
-         <button class="toggle-button" data-target="timer19" data-status="off">Pausar/Finalizar</button>
+         <input type="checkbox" id="automatico19" style="accent-color: red">Automático<br/>
+        <input type="checkbox" id="aireado19" style="accent-color: blue">Aireado<br/>
+         <button class="toggle-button" data-target="timer19" data-status="off">Pausar Remontado</button>
     </div>
 
      <div class="deposito">
-        <label for="minutesInput20">Deposito 20 - H7:</label>
+        <label for="minutesInput20">Deposito 20</label>
         <input type="number" id="minutesInput20" class="minutes-input" min="1" step="1" value="30">
         <button class="start-button" data-target="timer20">Iniciar remontado</button>
         <div id="timer20" class="timer"></div>
          <div id="endTime20" class="end-time"></div>
-         <input type="checkbox" style="accent-color: red">Automatico
-         <button class="toggle-button" data-target="timer20" data-status="off">Pausar/Finalizar</button>
+         <input type="checkbox" id="automatico20" style="accent-color: red">Automático<br/>
+         <input type="checkbox" id="aireado20" style="accent-color: blue">Aireado<br/>
+         <button class="toggle-button" data-target="timer20" data-status="off">Pausar Remontado</button>
     </div>
 
     <div class="deposito">
-        <label for="minutesInput21">Deposito 21 - V2:</label>
+        <label for="minutesInput21">Deposito 21</label>
         <input type="number" id="minutesInput21" class="minutes-input" min="1" step="1" value="30">
         <button class="start-button" data-target="timer21">Iniciar remontado</button>
         <div id="timer21" class="timer"></div>
         <div id="endTime21" class="end-time"></div>
-        <input type="checkbox" style="accent-color: red">Automatico
-        <button class="toggle-button" data-target="timer21" data-status="off">Pausar/Finalizar</button>
+        <input type="checkbox" id="automatico21" style="accent-color: red">Automático<br/>
+         <input type="checkbox" id="aireado21" style="accent-color: blue">Aireado<br/>
+        <button class="toggle-button" data-target="timer21" data-status="off">Pausar Remontado</button>
     </div>
 
     <div class="deposito">
-        <label for="minutesInput22">Deposito 22:</label>
+        <label for="minutesInput22">Deposito 22</label>
         <input type="number" id="minutesInput22" class="minutes-input" min="1" step="1" value="30">
         <button class="start-button" data-target="timer22">Iniciar remontado</button>
         <div id="timer22" class="timer"></div>
         <div id="endTime22" class="end-time"></div>
-        <input type="checkbox" style="accent-color: red">Automatico
-        <button class="toggle-button" data-target="timer22" data-status="off">Pausar/Finalizar</button>
+        <input type="checkbox" id="automatico22" style="accent-color: red">Automático<br/>
+         <input type="checkbox" id="aireado22" style="accent-color: blue">Aireado<br/>
+        <button class="toggle-button" data-target="timer22" data-status="off">Pausar Remontado</button>
     </div>
 
     <div class="deposito">
-        <label for="minutesInput23">Deposito 23:</label>
+        <label for="minutesInput23">Deposito 23</label>
         <input type="number" id="minutesInput23" class="minutes-input" min="1" step="1" value="30">
         <button class="start-button" data-target="timer23">Iniciar remontado</button>
         <div id="timer23" class="timer"></div>
         <div id="endTime23" class="end-time"></div>
-        <input type="checkbox" style="accent-color: red">Automatico
-        <button class="toggle-button" data-target="timer23" data-status="off">Pausar/Finalizar</button>
+        <input type="checkbox" id="automatico23" style="accent-color: red">Automático<br/>
+         <input type="checkbox" id="aireado23" style="accent-color: blue">Aireado<br/>
+        <button class="toggle-button" data-target="timer23" data-status="off">Pausar Remontado</button>
     </div>
 
-    <div class="deposito">
-        <label for="minutesInput24">Deposito 24:</label>
+    <div class="deposito vacio">
+        <label for="minutesInput24">Deposito 24</label>
         <input type="number" id="minutesInput24" class="minutes-input" min="1" step="1" value="30">
         <button class="start-button" data-target="timer24">Iniciar remontado</button>
         <div id="timer24" class="timer"></div>
         <div id="endTime24" class="end-time"></div>
-        <input type="checkbox" style="accent-color: red">Automatico
-        <button class="toggle-button" data-target="timer24" data-status="off">Pausar/Finalizar</button>
+        <input type="checkbox" id="automatico24" style="accent-color: red">Automático<br/>
+         <input type="checkbox" id="aireado24" style="accent-color: blue">Aireado<br/>
+        <button class="toggle-button" data-target="timer24" data-status="off">Pausar Remontado</button>
     </div>
 
-    <div class="deposito">
-        <label for="minutesInput25">Deposito 25 - P1:</label>
+    <div class="deposito vacio">
+        <label for="minutesInput25">Deposito 25</label>
         <input type="number" id="minutesInput25" class="minutes-input" min="1" step="1" value="30">
         <button class="start-button" data-target="timer25">Iniciar remontado</button>
         <div id="timer25" class="timer"></div>
         <div id="endTime25" class="end-time"></div>
-        <input type="checkbox" style="accent-color: red">Automatico
-        <button class="toggle-button" data-target="timer25" data-status="off">Pausar/Finalizar</button>
+        <input type="checkbox" id="automatico25" style="accent-color: red">Automático<br/>
+         <input type="checkbox" id="aireado25" style="accent-color: blue">Aireado<br/>
+        <button class="toggle-button" data-target="timer25" data-status="off">Pausar Remontado</button>
     </div>
 
-    <div class="deposito">
-        <label for="minutesInput26">Deposito 26 - E:</label>
+    <div class="deposito vacio">
+        <label for="minutesInput26">Deposito 26</label>
         <input type="number" id="minutesInput26" class="minutes-input" min="1" step="1" value="30">
         <button class="start-button" data-target="timer26">Iniciar remontado</button>
         <div id="timer26" class="timer"></div>
         <div id="endTime26" class="end-time"></div>
-        <input type="checkbox" style="accent-color: red">Automatico
-        <button class="toggle-button" data-target="timer26" data-status="off">Pausar/Finalizar</button>
+        <input type="checkbox" id="automatico26" style="accent-color: red">Automático<br/>
+         <input type="checkbox" id="aireado26" style="accent-color: blue">Aireado<br/>
+        <button class="toggle-button" data-target="timer26" data-status="off">Pausar Remontado</button>
     </div>
     
      <div class="deposito">
-        <label for="minutesInput27">Deposito 27 - VB2:</label>
+        <label for="minutesInput27">Deposito 27</label>
         <input type="number" id="minutesInput27" class="minutes-input" min="1" step="1" value="30">
         <button class="start-button" data-target="timer27">Iniciar remontado</button>
         <div id="timer27" class="timer"></div>
          <div id="endTime27" class="end-time"></div>
-         <input type="checkbox" style="accent-color: red">Automatico
-         <button class="toggle-button" data-target="timer27" data-status="off">Pausar/Finalizar</button>
+         <input type="checkbox" id="automatico27" style="accent-color: red">Automático<br/>
+         <input type="checkbox" id="aireado27" style="accent-color: blue">Aireado<br/>
+         <button class="toggle-button" data-target="timer27" data-status="off">Pausar Remontado</button>
     </div>
 
      <div class="deposito">
-        <label for="minutesInput28">Deposito 28 - N2:</label>
+        <label for="minutesInput28">Deposito 28</label>
         <input type="number" id="minutesInput28" class="minutes-input" min="1" step="1" value="30">
         <button class="start-button" data-target="timer28">Iniciar remontado</button>
         <div id="timer28" class="timer"></div>
          <div id="endTime28" class="end-time"></div>
-         <input type="checkbox" style="accent-color: red">Automatico
-         <button class="toggle-button" data-target="timer28" data-status="off">Pausar/Finalizar</button>
+         <input type="checkbox" id="automatico28" style="accent-color: red">Automático<br/>
+         <input type="checkbox" id="aireado28" style="accent-color: blue">Aireado<br/>
+         <button class="toggle-button" data-target="timer28" data-status="off">Pausar Remontado</button>
     </div>
 
      <div class="deposito">
-        <label for="minutesInput29">Deposito 29 - N1:</label>
+        <label for="minutesInput29">Deposito 29</label>
         <input type="number" id="minutesInput29" class="minutes-input" min="1" step="1" value="30">
         <button class="start-button" data-target="timer29">Iniciar remontado</button>
         <div id="timer29" class="timer"></div>
          <div id="endTime29" class="end-time"></div>
-         <input type="checkbox" style="accent-color: red">Automatico
-         <button class="toggle-button" data-target="timer29" data-status="off">Pausar/Finalizarr</button>
+         <input type="checkbox" id="automatico29" style="accent-color: red">Automático<br/>
+         <input type="checkbox" id="aireado29" style="accent-color: blue">Aireado<br/>
+         <button class="toggle-button" data-target="timer29" data-status="off">Pausar Remontado</button>
     </div>
 
      <div class="deposito">
-        <label for="minutesInput30">Deposito 30 - VB1:</label>
+        <label for="minutesInput30">Deposito 30</label>
         <input type="number" id="minutesInput30" class="minutes-input" min="1" step="1" value="40">
         <button class="start-button" data-target="timer30">Iniciar remontado</button>
         <div id="timer30" class="timer"></div>
          <div id="endTime30" class="end-time"></div>
-         <input type="checkbox" style="accent-color: red">Automatico
-         <button class="toggle-button" data-target="timer30" data-status="off">Pausar/Finalizar</button>
+         <input type="checkbox" id="automatico30" style="accent-color: red">Automático<br/>
+         <input type="checkbox" id="aireado30" style="accent-color: blue">Aireado<br/>
+         <button class="toggle-button" data-target="timer30" data-status="off">Pausar Remontado</button>
     </div>
 
     <div class="deposito">
-        <label for="minutesInput31">Deposito 31 - B1:</label>
+        <label for="minutesInput31">Deposito 31</label>
         <input type="number" id="minutesInput31" class="minutes-input" min="1" step="1" value="40">
         <button class="start-button" data-target="timer31">Iniciar remontado</button>
         <div id="timer31" class="timer"></div>
         <div id="endTime31" class="end-time"></div>
-        <input type="checkbox" style="accent-color: red">Automatico
-        <button class="toggle-button" data-target="timer31" data-status="off">Pausar/Finalizar</button>
+        <input type="checkbox" id="automatico31" style="accent-color: red">Automático<br/>
+         <input type="checkbox" id="aireado31" style="accent-color: blue">Aireado<br/>
+        <button class="toggle-button" data-target="timer31" data-status="off">Pausar Remontado</button>
     </div>
 
-     <div class="deposito">
-        <label for="minutesInput32">Deposito 32:</label>
+    <div class="deposito">
+        <label for="minutesInput32">Deposito 32</label>
         <input type="number" id="minutesInput32" class="minutes-input" min="1" step="1" value="40">
         <button class="start-button" data-target="timer32">Iniciar remontado</button>
         <div id="timer32" class="timer"></div>
         <div id="endTime32" class="end-time"></div>
-         <input type="checkbox" style="accent-color: red">Automatico
-         <button class="toggle-button" data-target="timer32" data-status="off">Pausar/Finalizar</button>
-    </div>
+        <input type="checkbox" id="automatico32" style="accent-color: red">Automático<br/>
+         <input type="checkbox" id="aireado32" style="accent-color: blue">Aireado<br/>
+         <button class="toggle-button" data-target="timer32" data-status="off">Pausar Remontado</button>
+    </div>  
 
     </div><!-- Fin div column -->
+
     </div><!-- Fin div container -->
 
     <script>
@@ -511,68 +578,27 @@ label {
             }
         };
     
-// Función para actualizar el temporizador
-const updateTimer = (timerId, timerDisplay, endTimeDisplay) => {
-    const now = Date.now();
-    let remainingTime = (timers[timerId].endTime - now) / 1000;
-
-    if (remainingTime <= 0) {
-        clearInterval(timers[timerId].intervalId);
-        timerDisplay.innerHTML = "¡Remontado terminado!";
-        timerDisplay.classList.add("finished");
-        
-        // Intentar notificar al usuario de múltiples maneras
-        notifyUser(timerId);
-    } else {
-        const minutos = Math.floor(remainingTime / 60);
-        const segundos = Math.floor(remainingTime % 60);
-        timerDisplay.innerHTML = `${formatTime(minutos)}:${formatTime(segundos)}`;
-        
-        // Mostrar la hora de finalización sin segundos
-        const options = { hour: '2-digit', minute: '2-digit' };
-        endTimeDisplay.innerHTML = `Finaliza a las ${new Date(timers[timerId].endTime).toLocaleTimeString([], options)}`;
-        
-        timerDisplay.classList.add("active");
-    }
-};
-
-// Registrar el Service Worker
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('service-worker.js')
-        .then(registration => console.log('Service Worker registrado'))
-        .catch(error => console.log('Error al registrar el Service Worker:', error));
-}
-
-// Función para notificar al usuario
-const notifyUser = (timerId) => {
-    // Intentar vibrar repetidamente
-    const vibrateRepeatedly = () => {
-        if ('vibrate' in navigator) {
-            navigator.vibrate([300, 150, 500]);
-            setTimeout(vibrateRepeatedly, 1000);
-        }
-    };
-
-    // Reproducir sonido
-    const playSound = () => {
-        const audio = new Audio('Isabella_Late_Lp.mp3');
-        audio.play().catch(err => console.error("Error al reproducir el audio:", err));
-    };
-
-    playSound();
-
-    // Mostrar notificación
-    if ('Notification' in window && Notification.permission === 'granted') {
-        // Usar el Service Worker para mostrar la notificación
-        navigator.serviceWorker.ready.then(registration => {
-            registration.showNotification('Remontado listo para la muestra', {
-                body: `El remontado del depósito ${timerId.replace("timer", "")} va a finalizar, es hora de tomar la muestra.`,
-                vibrate: [300, 150, 500],
-                requireInteraction: true
-            });
-        });
-    }
-};
+        // Función para actualizar el temporizador
+        const updateTimer = (timerId, timerDisplay, endTimeDisplay) => {
+            const now = Date.now();
+            let remainingTime = (timers[timerId].endTime - now) / 1000;
+    
+            if (remainingTime <= 0) {
+                clearInterval(timers[timerId].intervalId);
+                timerDisplay.innerHTML = "¡Remontado terminado!";
+                timerDisplay.classList.add("finished");
+                timerDisplay.setAttribute("aria-live", "assertive");
+    
+                notifyUser(timerId);
+            } else {
+                const minutos = Math.floor(remainingTime / 60);
+                const segundos = Math.floor(remainingTime % 60);
+                timerDisplay.innerHTML = `${formatTime(minutos)}:${formatTime(segundos)}`;
+    
+                const options = { hour: '2-digit', minute: '2-digit' };
+                endTimeDisplay.innerHTML = `Finaliza a las ${new Date(timers[timerId].endTime).toLocaleTimeString([], options)}`;
+            }
+        };
     
         // Función para iniciar el temporizador
         const startTimer = (button, index) => {
@@ -595,7 +621,6 @@ const notifyUser = (timerId) => {
     
             const timerDisplay = document.getElementById(timerId);
             const endTimeDisplay = document.getElementById(`endTime${index + 1}`);
-            const audio = new Audio('Isabella_Late_Lp.mp3');
     
             const updateTimerLocal = () => {
                 updateTimer(timerId, timerDisplay, endTimeDisplay);
@@ -649,6 +674,40 @@ const notifyUser = (timerId) => {
             button.addEventListener("click", () => toggleTimer(button, index));
         });
     
+        // Función para notificar al usuario
+        const notifyUser = (timerId) => {
+            const vibrateRepeatedly = () => {
+                if ('vibrate' in navigator) {
+                    navigator.vibrate([300, 150, 500]);
+                }
+            };
+            vibrateRepeatedly();
+    
+            const playSound = () => {
+                const audio = new Audio('Isabella_Late_Lp.mp3');
+                audio.play().catch(err => console.error("Error al reproducir el audio:", err));
+            };
+    
+            playSound();
+    
+            if ('Notification' in window && Notification.permission === 'granted') {
+                navigator.serviceWorker.ready.then(registration => {
+                    registration.showNotification('Remontado terminado', {
+                        body: `El remontado del depósito ${timerId.replace("timer", "")} ha finalizado.`,
+                        vibrate: [300, 150, 500],
+                        requireInteraction: true
+                    });
+                });
+            }
+        };
+    
+        // Registrar el Service Worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('service-worker.js')
+                .then(registration => console.log('Service Worker registrado'))
+                .catch(error => console.log('Error al registrar el Service Worker:', error));
+        }
+    
         // Reiniciar sesión y borrar localStorage
         const restartSession = () => {
             localStorage.clear(); // Borrar el localStorage antiguo
@@ -658,16 +717,15 @@ const notifyUser = (timerId) => {
         newSessionButton.addEventListener("click", restartSession);
     
         // Cargar el estado desde el localStorage al cargar la página
-        loadStateFromLocalStorage();
-
-        // Solicitar permiso para notificaciones al cargar la página
-document.addEventListener('DOMContentLoaded', () => {
-    loadStateFromLocalStorage();
-    if ('Notification' in window) {
-        Notification.requestPermission();
-    }
-});
+        document.addEventListener('DOMContentLoaded', () => {
+            loadStateFromLocalStorage();
+            if ('Notification' in window) {
+                Notification.requestPermission();
+            }
+        });
     
     </script>
+
 </body>
 </html>
+
