@@ -1,6 +1,6 @@
 self.addEventListener('notificationclick', function(event) {
     event.notification.close();
-    // Aquí puedes agregar cualquier acción que quieras que ocurra cuando se haga clic en la notificación
+    // Aquí se puede agregar cualquier acción para que ocurra cuando se haga clic en la notificación
 });
 self.addEventListener('push', function(event) {
     const options = {
