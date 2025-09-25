@@ -55,6 +55,33 @@
             background-color: #d4edda;
         }
 
+        /* Estilo para alerta de laboratorio */
+        .lab-alert {
+            background-color: #fff3cd !important;
+            border: 3px solid #ffc107 !important;
+            animation: labPulse 1s infinite alternate;
+        }
+
+        .lab-alert .timer {
+            background-color: #ffc107 !important;
+            color: #212529 !important;
+            font-weight: 900;
+        }
+
+        .lab-alert .end-time {
+            background-color: #ffc107 !important;
+            color: #212529 !important;
+        }
+
+        @keyframes labPulse {
+            0% { 
+                box-shadow: 0 0 5px #ffc107;
+            }
+            100% { 
+                box-shadow: 0 0 20px #ffc107, 0 0 30px #ffc107;
+            }
+        }
+
         .end-time {
             font-size: 2em;
             text-align: center;
@@ -360,9 +387,9 @@ input[type="checkbox"] {
          <button class="toggle-button" data-target="timer9" data-status="off">Pausar Remontado</button>
     </div>
 
-     <div class="deposito">
+     <div class="deposito vacio">
         <label for="minutesInput10">Deposito 10</label>
-        <input type="number" id="minutesInput10" class="minutes-input" min="1" step="1" value="10">
+        <input type="number" id="minutesInput10" class="minutes-input" min="1" step="1" value="30">
         <button class="start-button" data-target="timer10">Iniciar remontado</button>
         <div id="timer10" class="timer"></div>
          <div id="endTime10" class="end-time"></div>
@@ -540,7 +567,7 @@ input[type="checkbox"] {
         <button class="toggle-button" data-target="timer25" data-status="off">Pausar Remontado</button>
     </div>
 
-    <div class="deposito">
+    <div class="deposito vacio">
         <label for="minutesInput26">Deposito 26</label>
         <input type="number" id="minutesInput26" class="minutes-input" min="1" step="1" value="30">
         <button class="start-button" data-target="timer26">Iniciar remontado</button>
@@ -791,6 +818,7 @@ input[type="checkbox"] {
                         timers[timerId] = state.timers[timerId];
                         const timerDisplay = document.getElementById(timerId);
                         const endTimeDisplay = document.getElementById(`endTime${timerId.replace("timer", "")}`);
+                        const depositoElement = timerDisplay.closest('.deposito');
                         
                         const now = Date.now();
                         let remainingTime = (timers[timerId].endTime - now) / 1000;
@@ -806,6 +834,11 @@ input[type="checkbox"] {
                             timerDisplay.innerHTML = `${formatTime(minutos)}:${formatTime(segundos)}`;
                             endTimeDisplay.innerHTML = `Finaliza a las ${new Date(timers[timerId].endTime).toLocaleTimeString()}`;
                             timerDisplay.classList.add("active");
+                            
+                            // Restaurar alerta de laboratorio si estaba activa
+                            if (timers[timerId].labAlertActive && isLabMode) {
+                                depositoElement.classList.add("lab-alert");
+                            }
         
                             // Reiniciar el temporizador
                             timers[timerId].intervalId = setInterval(() => updateTimer(timerId, timerDisplay, endTimeDisplay), 1000);
@@ -819,12 +852,17 @@ input[type="checkbox"] {
         const updateTimer = (timerId, timerDisplay, endTimeDisplay) => {
             const now = Date.now();
             let remainingTime = (timers[timerId].endTime - now) / 1000;
+            const depositoElement = timerDisplay.closest('.deposito');
     
             if (remainingTime <= 0) {
                 clearInterval(timers[timerId].intervalId);
                 timerDisplay.innerHTML = "¡Remontado terminado!";
                 timerDisplay.classList.add("finished");
                 timerDisplay.setAttribute("aria-live", "assertive");
+                
+                // Limpiar alerta de laboratorio si existía
+                depositoElement.classList.remove("lab-alert");
+                delete timers[timerId].labAlertActive;
     
                 notifyUser(timerId, 'finished');
             } else {
@@ -836,8 +874,17 @@ input[type="checkbox"] {
                 endTimeDisplay.innerHTML = `Finaliza a las ${new Date(timers[timerId].endTime).toLocaleTimeString([], options)}`;
                 
                 // Verificar si necesita alerta de laboratorio
-                if (isLabMode && minutos === labAlertMinutes && segundos === 0) {
+                if (isLabMode && minutos === labAlertMinutes && segundos === 0 && !timers[timerId].labAlertActive) {
+                    // Activar alerta visual
+                    depositoElement.classList.add("lab-alert");
+                    timers[timerId].labAlertActive = true;
                     notifyUser(timerId, 'lab-alert');
+                }
+                
+                // Limpiar alerta visual cuando pase el tiempo crítico (1 minuto después)
+                if (timers[timerId].labAlertActive && minutos < (labAlertMinutes - 1)) {
+                    depositoElement.classList.remove("lab-alert");
+                    delete timers[timerId].labAlertActive;
                 }
             }
         };
