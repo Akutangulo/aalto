@@ -161,6 +161,98 @@ input[type="checkbox"] {
             background-color: #4a0e1c;
         }
 
+        /* Estilos para el toggle de rol */
+        .role-selector {
+            background-color: #f8f9fa;
+            border: 2px solid #8c1c2c;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 10px;
+            text-align: center;
+        }
+
+        .role-toggle-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .role-label {
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: #8c1c2c;
+        }
+
+        /* Toggle Switch Styling */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #8c1c2c;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #007bff;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .lab-controls {
+            display: none;
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #e7f3ff;
+            border-radius: 6px;
+            border: 1px solid #007bff;
+        }
+
+        .lab-controls.visible {
+            display: block;
+        }
+
+        .lab-input {
+            width: 80px;
+            padding: 5px;
+            border: 1px solid #007bff;
+            border-radius: 4px;
+            text-align: center;
+            margin: 0 10px;
+        }
+
     </style>
     
 </head>
@@ -529,50 +621,197 @@ input[type="checkbox"] {
 
     </div><!-- Fin div container -->
 
+    <!-- Selector de Rol -->
+    <div class="role-selector">
+        <div class="role-toggle-container">
+            <span class="role-label">REMONTADOR</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="roleToggle">
+                <span class="slider"></span>
+            </label>
+            <span class="role-label">LABORATORIO</span>
+        </div>
+        
+        <div id="labControls" class="lab-controls">
+            <label for="labMinutes">Alertar 
+                <input type="number" id="labMinutes" class="lab-input" min="1" max="30" value="5"> 
+                minutos antes de terminar
+            </label>
+        </div>
+    </div>
+
     <script>
         const timers = {};
         const startButtons = document.querySelectorAll(".start-button");
         const toggleButtons = document.querySelectorAll(".toggle-button");
         const minutesInputs = document.querySelectorAll(".minutes-input");
         const newSessionButton = document.getElementById("new-session-button");
-    
+        const roleToggle = document.getElementById("roleToggle");
+        const labControls = document.getElementById("labControls");
+        const labMinutes = document.getElementById("labMinutes");
+        
+        // Variables para el modo laboratorio
+        let isLabMode = false;
+        let labAlertMinutes = 5;
+        
         // Función para formatear minutos y segundos con dos dígitos
         const formatTime = (time) => (time < 10 ? `0${time}` : time);
+        
+        // Sistema de audio mejorado para standby
+        let audioContext = null;
+        let audioBuffer = null;
+        
+        // Inicializar contexto de audio
+        const initAudioContext = async () => {
+            if (!audioContext) {
+                try {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    // Precargar el audio
+                    await loadAudioFile();
+                } catch (error) {
+                    console.error("Error al inicializar el contexto de audio:", error);
+                }
+            }
+        };
+        
+        // Cargar archivo de audio
+        const loadAudioFile = async () => {
+            try {
+                const response = await fetch('navarr0-escurre.mp3');
+                const arrayBuffer = await response.arrayBuffer();
+                audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+            } catch (error) {
+                console.error("Error al cargar el archivo de audio:", error);
+            }
+        };
+        
+        // Reproducir audio con múltiples intentos
+        const playAudioRobust = async () => {
+            const playMethods = [
+                () => playWithWebAudio(),
+                () => playWithHTMLAudio(),
+                () => playWithHTMLAudioForced()
+            ];
+            
+            for (let i = 0; i < playMethods.length; i++) {
+                try {
+                    await playMethods[i]();
+                    break; // Si funciona, salir del bucle
+                } catch (error) {
+                    console.error(`Método ${i + 1} falló:`, error);
+                    if (i === playMethods.length - 1) {
+                        console.error("Todos los métodos de reproducción fallaron");
+                    }
+                }
+            }
+        };
+        
+        // Método 1: Web Audio API
+        const playWithWebAudio = async () => {
+            if (audioContext && audioBuffer) {
+                if (audioContext.state === 'suspended') {
+                    await audioContext.resume();
+                }
+                const source = audioContext.createBufferSource();
+                source.buffer = audioBuffer;
+                source.connect(audioContext.destination);
+                source.start(0);
+            } else {
+                throw new Error("AudioContext o buffer no disponible");
+            }
+        };
+        
+        // Método 2: HTML Audio normal
+        const playWithHTMLAudio = () => {
+            return new Promise((resolve, reject) => {
+                const audio = new Audio('navarr0-escurre.mp3');
+                audio.addEventListener('canplaythrough', () => {
+                    audio.play().then(resolve).catch(reject);
+                });
+                audio.addEventListener('error', reject);
+                audio.load();
+            });
+        };
+        
+        // Método 3: HTML Audio forzado
+        const playWithHTMLAudioForced = () => {
+            return new Promise((resolve, reject) => {
+                const audio = new Audio('navarr0-escurre.mp3');
+                audio.volume = 1.0;
+                audio.muted = false;
+                audio.play().then(resolve).catch(reject);
+            });
+        };
+        
+        // Vibración mejorada
+        const vibrateRobust = () => {
+            if ('vibrate' in navigator) {
+                // Intentar múltiples patrones
+                const patterns = [
+                    [300, 150, 500],
+                    [500, 200, 500, 200, 500],
+                    [200, 100, 200]
+                ];
+                
+                patterns.forEach((pattern, index) => {
+                    setTimeout(() => {
+                        navigator.vibrate(pattern);
+                    }, index * 100);
+                });
+            }
+        };
     
         // Guardar el estado de los remontados en el localStorage
         const saveStateToLocalStorage = () => {
-            localStorage.setItem('timers', JSON.stringify(timers));
+            const state = {
+                timers: timers,
+                isLabMode: isLabMode,
+                labAlertMinutes: labAlertMinutes
+            };
+            localStorage.setItem('aaltoAppState', JSON.stringify(state));
         };
     
         // Cargar el estado desde el localStorage
         const loadStateFromLocalStorage = () => {
-            const storedTimers = localStorage.getItem('timers');
-            if (storedTimers) {
-                const parsedTimers = JSON.parse(storedTimers);
-                Object.keys(parsedTimers).forEach(timerId => {
-                    timers[timerId] = parsedTimers[timerId];
-                    const timerDisplay = document.getElementById(timerId);
-                    const endTimeDisplay = document.getElementById(`endTime${timerId.replace("timer", "")}`);
-                    
-                    const now = Date.now();
-                    let remainingTime = (timers[timerId].endTime - now) / 1000;
-    
-                    if (remainingTime <= 0) {
-                        timerDisplay.innerHTML = "¡Remontado terminado!";
-                        timerDisplay.classList.add("finished");
-                    } else {
-                        timers[timerId].timeRemaining = remainingTime;
-                        const minutos = Math.floor(remainingTime / 60);
-                        const segundos = Math.floor(remainingTime % 60);
-    
-                        timerDisplay.innerHTML = `${formatTime(minutos)}:${formatTime(segundos)}`;
-                        endTimeDisplay.innerHTML = `Finaliza a las ${new Date(timers[timerId].endTime).toLocaleTimeString()}`;
-                        timerDisplay.classList.add("active");
-    
-                        // Reiniciar el temporizador
-                        timers[timerId].intervalId = setInterval(() => updateTimer(timerId, timerDisplay, endTimeDisplay), 1000);
-                    }
-                });
+            const storedState = localStorage.getItem('aaltoAppState');
+            if (storedState) {
+                const state = JSON.parse(storedState);
+                
+                // Restaurar configuración de laboratorio
+                isLabMode = state.isLabMode || false;
+                labAlertMinutes = state.labAlertMinutes || 5;
+                
+                roleToggle.checked = isLabMode;
+                labMinutes.value = labAlertMinutes;
+                updateLabControls();
+                
+                // Restaurar timers
+                if (state.timers) {
+                    Object.keys(state.timers).forEach(timerId => {
+                        timers[timerId] = state.timers[timerId];
+                        const timerDisplay = document.getElementById(timerId);
+                        const endTimeDisplay = document.getElementById(`endTime${timerId.replace("timer", "")}`);
+                        
+                        const now = Date.now();
+                        let remainingTime = (timers[timerId].endTime - now) / 1000;
+        
+                        if (remainingTime <= 0) {
+                            timerDisplay.innerHTML = "¡Remontado terminado!";
+                            timerDisplay.classList.add("finished");
+                        } else {
+                            timers[timerId].timeRemaining = remainingTime;
+                            const minutos = Math.floor(remainingTime / 60);
+                            const segundos = Math.floor(remainingTime % 60);
+        
+                            timerDisplay.innerHTML = `${formatTime(minutos)}:${formatTime(segundos)}`;
+                            endTimeDisplay.innerHTML = `Finaliza a las ${new Date(timers[timerId].endTime).toLocaleTimeString()}`;
+                            timerDisplay.classList.add("active");
+        
+                            // Reiniciar el temporizador
+                            timers[timerId].intervalId = setInterval(() => updateTimer(timerId, timerDisplay, endTimeDisplay), 1000);
+                        }
+                    });
+                }
             }
         };
     
@@ -587,7 +826,7 @@ input[type="checkbox"] {
                 timerDisplay.classList.add("finished");
                 timerDisplay.setAttribute("aria-live", "assertive");
     
-                notifyUser(timerId);
+                notifyUser(timerId, 'finished');
             } else {
                 const minutos = Math.floor(remainingTime / 60);
                 const segundos = Math.floor(remainingTime % 60);
@@ -595,6 +834,11 @@ input[type="checkbox"] {
     
                 const options = { hour: '2-digit', minute: '2-digit' };
                 endTimeDisplay.innerHTML = `Finaliza a las ${new Date(timers[timerId].endTime).toLocaleTimeString([], options)}`;
+                
+                // Verificar si necesita alerta de laboratorio
+                if (isLabMode && minutos === labAlertMinutes && segundos === 0) {
+                    notifyUser(timerId, 'lab-alert');
+                }
             }
         };
     
@@ -605,7 +849,7 @@ input[type="checkbox"] {
             const minutosElegidos = parseInt(minutesInputs[index].value);
             let segundosRestantes = minutosElegidos * 60;
     
-            const horaInicio = Date.now(); // Hora actual en milisegundos
+            const horaInicio = Date.now();
             const horaFinalizacion = horaInicio + segundosRestantes * 1000;
     
             timers[timerId] = {
@@ -622,11 +866,11 @@ input[type="checkbox"] {
     
             const updateTimerLocal = () => {
                 updateTimer(timerId, timerDisplay, endTimeDisplay);
-                saveStateToLocalStorage(); // Guardar estado cada segundo
+                saveStateToLocalStorage();
             };
     
             timers[timerId].intervalId = setInterval(updateTimerLocal, 1000);
-            saveStateToLocalStorage(); // Guardar estado al iniciar
+            saveStateToLocalStorage();
         };
     
         startButtons.forEach((button, index) => {
@@ -639,17 +883,15 @@ input[type="checkbox"] {
             const status = button.getAttribute("data-status");
     
             if (status === "off") {
-                // Pausar el temporizador
                 clearInterval(timers[timerId].intervalId);
                 timers[timerId].isPaused = true;
-                timers[timerId].pausedAt = Date.now(); // Hora de pausa en milisegundos
+                timers[timerId].pausedAt = Date.now();
                 button.setAttribute("data-status", "on");
                 button.textContent = "Reanudar Remontado";
             } else {
-                // Reanudar el temporizador
                 const now = Date.now();
-                const pauseDuration = now - timers[timerId].pausedAt; // Calcular cuánto tiempo estuvo en pausa
-                timers[timerId].endTime += pauseDuration; // Ajustar la hora de finalización
+                const pauseDuration = now - timers[timerId].pausedAt;
+                timers[timerId].endTime += pauseDuration;
     
                 button.setAttribute("data-status", "off");
                 button.textContent = "Pausar Remontado";
@@ -660,12 +902,12 @@ input[type="checkbox"] {
     
                 const updateTimerLocal = () => {
                     updateTimer(timerId, timerDisplay, endTimeDisplay);
-                    saveStateToLocalStorage(); // Guardar estado cada segundo
+                    saveStateToLocalStorage();
                 };
     
                 timers[timerId].intervalId = setInterval(updateTimerLocal, 1000);
             }
-            saveStateToLocalStorage(); // Guardar estado al pausar/reanudar
+            saveStateToLocalStorage();
         };
     
         toggleButtons.forEach((button, index) => {
@@ -673,31 +915,58 @@ input[type="checkbox"] {
         });
     
         // Función para notificar al usuario
-        const notifyUser = (timerId) => {
-            const vibrateRepeatedly = () => {
-                if ('vibrate' in navigator) {
-                    navigator.vibrate([300, 150, 500]);
-                }
-            };
-            vibrateRepeatedly();
+        const notifyUser = async (timerId, type = 'finished') => {
+            const depositoNum = timerId.replace("timer", "");
+            
+            // Vibración robusta
+            vibrateRobust();
     
-            const playSound = () => {
-                const audio = new Audio('Isabella_Late_Lp.mp3');
-                audio.play().catch(err => console.error("Error al reproducir el audio:", err));
-            };
+            // Audio robusto
+            await playAudioRobust();
     
-            playSound();
-    
+            // Notificación push
             if ('Notification' in window && Notification.permission === 'granted') {
                 navigator.serviceWorker.ready.then(registration => {
-                    registration.showNotification('Remontado terminado', {
-                        body: `El remontado del depósito ${timerId.replace("timer", "")} ha finalizado.`,
+                    let title, body;
+                    
+                    if (type === 'lab-alert') {
+                        title = `Alerta Laboratorio - ${labAlertMinutes} min`;
+                        body = `El depósito ${depositoNum} terminará en ${labAlertMinutes} minutos.`;
+                    } else {
+                        title = 'Remontado terminado';
+                        body = `El remontado del depósito ${depositoNum} ha finalizado.`;
+                    }
+                    
+                    registration.showNotification(title, {
+                        body: body,
                         vibrate: [300, 150, 500],
-                        requireInteraction: true
+                        requireInteraction: true,
+                        tag: `remontado-${depositoNum}-${type}`
                     });
                 });
             }
         };
+        
+        // Funciones para el modo laboratorio
+        const updateLabControls = () => {
+            if (isLabMode) {
+                labControls.classList.add('visible');
+            } else {
+                labControls.classList.remove('visible');
+            }
+        };
+        
+        // Event listeners para el modo laboratorio
+        roleToggle.addEventListener('change', () => {
+            isLabMode = roleToggle.checked;
+            updateLabControls();
+            saveStateToLocalStorage();
+        });
+        
+        labMinutes.addEventListener('change', () => {
+            labAlertMinutes = parseInt(labMinutes.value);
+            saveStateToLocalStorage();
+        });
     
         // Registrar el Service Worker
         if ('serviceWorker' in navigator) {
@@ -708,22 +977,26 @@ input[type="checkbox"] {
     
         // Reiniciar sesión y borrar localStorage
         const restartSession = () => {
-            localStorage.clear(); // Borrar el localStorage antiguo
+            localStorage.clear();
             location.reload();
         };
     
         newSessionButton.addEventListener("click", restartSession);
-    
-        // Cargar el estado desde el localStorage al cargar la página
-        document.addEventListener('DOMContentLoaded', () => {
+        
+        // Inicializar audio al cargar
+        document.addEventListener('DOMContentLoaded', async () => {
+            await initAudioContext();
             loadStateFromLocalStorage();
             if ('Notification' in window) {
                 Notification.requestPermission();
             }
         });
+        
+        // Reiniciar contexto de audio con interacción del usuario
+        document.addEventListener('click', initAudioContext, { once: true });
+        document.addEventListener('touchstart', initAudioContext, { once: true });
     
     </script>
 
 </body>
 </html>
-
